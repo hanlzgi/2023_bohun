@@ -1,0 +1,70 @@
+html.cho2-webgl {
+    height: 100%;
+    background: #131b17;
+}
+html.cho2-webgl body {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    min-height: 0;
+    height: 100%;
+    height: 100dvh;
+}
+.cho2-webgl #unity-container {
+    position: absolute;
+    inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+           env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    width: auto;
+    height: auto;
+    overflow: hidden;
+}
+.cho2-webgl #unity-canvas {
+    touch-action: none;
+}
+.cho2-webgl #unity-fullscreen-button {
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    transform: translateX(-50%);
+    border: 0;
+    cursor: pointer;
+}
+.cho2-webgl #loading-cover {
+    z-index: 98;
+    background: #131b17;
+    color: white;
+}
+.cho2-notices {
+    position: absolute;
+    z-index: 3;
+    top: calc(env(safe-area-inset-top, 0px) + 52px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    gap: 4px;
+    width: max-content;
+    max-width: min(33rem, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+    pointer-events: none;
+    font: 13px/1.45 system-ui, sans-serif;
+}
+.cho2-notices [hidden] { display: none; }
+.cho2-notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: #17251de8;
+    color: white;
+    pointer-events: auto;
+}
+.cho2-notice button {
+    flex-shrink: 0;
+    min-height: 32px;
+}
+.cho2-webgl .ctaDiv {
+    padding: 16px;
+    text-align: center;
+}

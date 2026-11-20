@@ -1,0 +1,54 @@
+{
+  "title": "국립5·18민주묘지(5·18추모관)",
+  "headerButton": "민주",
+  "mainImage": "images/095_mpva_main.png",
+  "description": "1980년 5월 18일 광주에서 일어난 민주화운동의 희생자들이 잠든 <b>국립민주묘지</b>로, <b>5·18추모관</b> 등을 통해 5·18민주화운동의 고귀한 정신과 역사적 의미를 되새기는 공간이다.",
+  "tags": [
+    "#5·18민주화운동_기념일",
+    "#위르겐_힌츠페터"
+  ],
+  "location": "광주광역시 북구 민주로 200",
+  "mainlink": "https://www.mpva.go.kr/518/index.do",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 국가기념일로 제정된 5·18민주화운동의 역사적 의의에 대해 알아보자!",
+        "② 1980년 5월 광주의 실상을 세계에 알린 독일인 기자에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "5·18민주화운동의 역사적 의의",
+      "cards": [
+        {
+          "image": "images/095_mpva_section1.png",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.bohun.or.kr/upload/bohunedu/digitaltextbook/narasarangDay/mpvael3.html#page=69"
+        }
+      ]
+    },
+    {
+      "title": "위르겐 힌츠페터",
+      "cards": [
+        {
+          "image": "images/095_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=CgNtSCtA-U8"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3258.8403778694656!2d126.93754377647079!3d35.23534337273455!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357192c4573c905f%3A0xbc08e0b4883c5030!2z6rWt66a9NS4xOOuvvOyjvOusmOyngA!5e0!3m2!1sko!2skr!4v1748568209997!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/ykB6sCRvK4RD48Nf9"
+        }
+      ]
+    }
+  ]
+}

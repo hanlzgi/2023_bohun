@@ -1,0 +1,55 @@
+{
+  "title": "딘 헤스 대령 공적 기념비(제주항공우주박물관 내)",
+  "headerButton": "호국",
+  "mainImage": "images/068_mpva_main.jpg",
+  "description": "6·25전쟁에 전투기 조종사로 참전하여 <b>한국 공군 조종사 양성</b>에 기여하고, 군 수송기로 <b>전쟁고아 1,000여 명</b>을 구출하며 보육원 설립 및 기금 마련에 앞장섰던 <b>딘 헤스 대령</b>을 기리는 기념비이다.",
+  "tags": [
+    "#공군의_대부",
+    "#전쟁고아의_아버지",
+    "#유모차_공수작전"
+  ],
+  "location": "제주특별자치도 서귀포시 안덕면 녹차분재로 218 제주항공우주박물관 내",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?sid=1999&memorialType=true&gubunCode=ALL&pageIndex=1&searchCondition=%EC%A0%9C%EB%AA%A9&searchKeyword=%EB%94%98+%ED%97%A4%EC%8A%A4+%EB%8C%80%EB%A0%B9+%EA%B3%B5%EC%A0%81+%EA%B8%B0%EB%85%90%EB%B9%84",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 대한민국 공군의 대부라고 불린 이 사람에 대해 알아보자!",
+        "② 6·25전쟁이 남긴 상처 '전쟁고아'를 위해 활약한 이야기를 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "딘 헤스 대령",
+      "cards": [
+        {
+          "image": "images/068_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/221368952928?trackingCode=blog_bloghome_searchlist"
+        }
+      ]
+    },
+    {
+      "title": "유모차 공수 작전",
+      "cards": [
+        {
+          "image": "images/068_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=kZaq-x-tUlo"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3334.61600126361!2d126.29652817628119!3d33.3027076569346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x350c5d1b3c96fc13%3A0xaccea23b8bdb2993!2z7KCc7KO87Yq567OE7J6Q7LmY64-EIOyEnOq3gO2PrOyLnCDslYjrjZXrqbQg64W57LCo67aE7J6s66GcIDIxOA!5e0!3m2!1sko!2skr!4v1748326956219!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/nyzLwMifDEMT1hc1A"
+        }
+      ]
+    }
+  ]
+}

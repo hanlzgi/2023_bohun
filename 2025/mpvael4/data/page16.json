@@ -1,0 +1,54 @@
+{
+  "title": "목포 양동교회 3·1운동 만세시위지",
+  "headerButton": "독립",
+  "mainImage": "images/022_mpva_main.jpg",
+  "description": "1919년 4월 8일 <b>목포에서 일어난 만세시위</b>를 계획한 장소이자 3·1운동을 이끌었던 곳이다. 지역 유지였던 양동교회 교인들은 영흥학교, 정명여학교의 교사, 학생들과 함께 만세시위를 준비하였다.",
+  "tags": [
+    "#4·8만세운동",
+    "#서상봉"
+  ],
+  "location": "전라남도 목포시 호남로 15(양동)",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?sid=297&memorialType=true&gubunCode=ALL&pageIndex=1&searchCondition=%EC%A0%9C%EB%AA%A9&searchKeyword=%EC%96%91%EB%8F%99%EA%B5%90%ED%9A%8C",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 1919년 4월 8일 목포에서 일어난 만세운동에 대해 알아보자!",
+        "② 1919년 4월 8일 목포 만세운동을 주도한 사람에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "4·8만세운동",
+      "cards": [
+        {
+          "image": "images/022_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=iN3vd22Gprc"
+        }
+      ]
+    },
+    {
+      "title": "서상봉",
+      "cards": [
+        {
+          "image": "images/022_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://search.i815.or.kr/dictionary/detail.do?searchWord=&reSearchWord=&searchType=all&index=1&id=8062"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d688.7844330168978!2d126.37967546429849!3d34.795137443782444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3573bb32e67571ab%3A0x1fa8371483ed3c48!2z66qp7Y-s7JaR64-Z6rWQ7ZqM!5e0!3m2!1sko!2skr!4v1747925412776!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/XpgfbiPocLBRnfxg7"
+        }
+      ]
+    }
+  ]
+}

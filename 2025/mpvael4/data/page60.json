@@ -1,0 +1,54 @@
+{
+  "title": "다부동전적기념관",
+  "headerButton": "호국",
+  "mainImage": "images/059_mpva_main.jpg",
+  "description": "1950년 6월 25일 북한의 기습 남침으로 전쟁이 일어나 국군이 낙동강까지 후퇴한 방어선에서 <b>국군과 유엔군</b>이 치열하게 싸워 승리한 <b>다부동 전투</b>를 기념하는 곳이다.",
+  "tags": [
+    "#낙동강_방어선",
+    "#다부동_전투"
+  ],
+  "location": "경상북도 칠곡군 가산면 호국로 1486",
+  "mainlink": "https://www.dabu.or.kr/ver2/main/index.php",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 6·25전쟁에서 낙동강 방어선이 가지는 의미를 알아보자!",
+        "② 다부동 전투는 어떻게 전개되었을까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "낙동강 방어선",
+      "cards": [
+        {
+          "image": "images/059_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=kFJQZL9-Szs"
+        }
+      ]
+    },
+    {
+      "title": "다부동 전투",
+      "cards": [
+        {
+          "image": "images/059_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/221564206388?trackingCode=blog_bloghome_searchlist"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3225.92029371425!2d128.517652!3d36.0466511!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3565dc8e445a254f%3A0xb2737f75ecde2733!2z64uk67aA64-ZIOyghOyggeq4sOuFkOq0gA!5e0!3m2!1sko!2skr!4v1747902614058!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/f8uZfsgg7J6UjArm6"
+        }
+      ]
+    }
+  ]
+}

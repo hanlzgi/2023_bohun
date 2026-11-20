@@ -1,0 +1,44 @@
+# 1. MIME 타입 정의 (기본 설정)
+<IfModule mod_mime.c>
+    AddType application/wasm .wasm
+    AddType application/octet-stream .data
+    AddType application/javascript .js
+</IfModule>
+
+# 2-1. Brotli(.br) 압축 빌드용 설정 - 2026-11-19 추가
+# .br 파일에 "Content-Encoding: br" 헤더를 붙여 브라우저가 압축을 풀게 함
+<IfModule mod_mime.c>
+    RemoveType .br
+    RemoveLanguage .br
+    AddEncoding br .br
+    AddType application/javascript .js.br
+    AddType application/wasm .wasm.br
+    AddType application/octet-stream .data.br
+</IfModule>
+
+# 2. 헤더 강제 설정 (핵심 수정 사항)
+# 서버의 기본 설정이 AddType을 무시하는 경우를 대비해, 응답 헤더를 강제로 지정합니다.
+<IfModule mod_headers.c>
+    <FilesMatch "\.wasm$">
+        # 브라우저에게 이 파일이 무조건 wasm임을 명시
+        Header set Content-Type "application/wasm"
+    </FilesMatch>
+    # 2-1 추가: .wasm.br 타입 지정 + AddEncoding이 안 먹는 서버 대비
+    <FilesMatch "\.wasm\.br$">
+        Header set Content-Type "application/wasm"
+    </FilesMatch>
+    <FilesMatch "\.br$">
+        Header set Content-Encoding "br"
+    </FilesMatch>
+</IfModule>
+
+# 2-2. 이미 압축된 .br 파일은 서버가 다시 압축하지 않도록 제외 - 2026-11-19 추가
+<IfModule mod_setenvif.c>
+    SetEnvIfNoCase Request_URI "\.br$" no-gzip dont-vary
+</IfModule>
+
+# 3. 압축 활성화 (선택사항 - 성능 향상)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE application/wasm
+    AddOutputFilterByType DEFLATE application/javascript
+</IfModule>

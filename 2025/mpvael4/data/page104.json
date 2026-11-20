@@ -1,0 +1,54 @@
+{
+  "title": "전일빌딩245",
+  "headerButton": "민주",
+  "mainImage": "images/094_mpva_main.jpg",
+  "description": "<b>전일빌딩</b>은 1980년 <b>5·18민주화운동</b> 당시 시민군이 마지막까지 저항했던 장소 중 하나이다. 특히, <b>헬기사격의 총탄 흔적 245개</b>가 발견되면서, 전일빌딩의 역사적 의미를 되새기는 장소로 보존 및 활용되고 있다.",
+  "tags": [
+    "#금남로",
+    "#245"
+  ],
+  "location": "광주광역시 동구 금남로 245",
+  "mainlink": "https://www.gwangju.go.kr/jeonil/contentsView.do?pageId=jeonil2",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 수십만의 시민들이 모여 계엄군에 맞서 투쟁한 거리에 대해 알아보자!",
+        "② 전일빌딩245의 숨겨진 의미에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "금남로",
+      "cards": [
+        {
+          "image": "images/094_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=C7Zw9Xg0fn4"
+        }
+      ]
+    },
+    {
+      "title": "245",
+      "cards": [
+        {
+          "image": "images/094_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/shorts/qD36Mq7q8ks"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13049.32320170372!2d126.90847932672206!3d35.1483699112827!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35718c85aeeb9661%3A0x30728a2fff0df3a8!2z7KCE7J2867mM65SpIDI0NSAoNS4xOCDqtJHso7zrr7zso7ztmZTsmrTrj5kg7IKs7KCB7KeAIDI47Zi4KQ!5e0!3m2!1sko!2skr!4v1747926776727!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/m8ijSqzadupZjBbc9"
+        }
+      ]
+    }
+  ]
+}

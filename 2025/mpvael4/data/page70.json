@@ -1,0 +1,55 @@
+{
+  "title": "에티오피아한국전참전기념관",
+  "headerButton": "호국",
+  "mainImage": "images/070_mpva_main.png",
+  "description": "6·25전쟁 당시 <b>유엔군</b> 일원으로 참전하였던 <b>에티오피아 참전군</b>의 활약을 알리고 전쟁의 교훈을 되새기기 위하여 춘천시에서 설립한 곳으로 <b>에티오피아 전통가옥 양식</b>인 돔 형태로 지어졌다.",
+  "tags": [
+    "#강뉴부대",
+    "#253전_253승",
+    "#구르무_담보바"
+  ],
+  "location": "강원특별자치도 춘천시 근화동 이디오피아길 1",
+  "mainlink": "http://epchun.kr/",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 한국전쟁에 참전한 에티오피아 군대에 대해 알아보자!",
+        "② 6·25전쟁 중 에티오피아에서 두 번 참전한 군인에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "강뉴부대",
+      "cards": [
+        {
+          "image": "images/070_mpva_section1.png",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/221325615270"
+        }
+      ]
+    },
+    {
+      "title": "구르무_담보바",
+      "cards": [
+        {
+          "image": "images/070_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=KmZkTaX3WLs"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3149.4242222281814!2d127.70918057656756!3d37.87376067196061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3562e6881e18a7df%3A0xa109e845460f76d2!2z7JeQ7Yuw7Jik7ZS87JWEIO2VnOq1reyghCDssLjsoIQg6riw64WQ6rSA!5e0!3m2!1sko!2skr!4v1748567155275!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/XGmKEF6fFv555soe9"
+        }
+      ]
+    }
+  ]
+}

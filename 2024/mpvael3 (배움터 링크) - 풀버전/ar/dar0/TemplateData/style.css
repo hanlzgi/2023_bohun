@@ -1,0 +1,103 @@
+html, body {
+    margin: 0;
+    overflow: hidden;
+    background: #231f20;
+    overscroll-behavior: none;
+}
+
+#web-player {
+    --player-height: min(var(--viewport-height, 100vh), 100vh);
+    position: fixed;
+    top: var(--viewport-top, 0px);
+    left: 0;
+    width: 100%;
+    height: var(--player-height);
+    box-sizing: border-box;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+        env(safe-area-inset-bottom) env(safe-area-inset-left);
+    display: grid;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    overflow: hidden;
+    background: #231f20;
+}
+
+@supports (height: 100dvh) {
+    #web-player { --player-height: min(var(--viewport-height, 100dvh), 100dvh); }
+    .intro-layout { --viewport-height: 100dvh; }
+}
+
+.intro-layout #web-player {
+    background: #231f20 url('intro-background.png') center / cover no-repeat;
+}
+
+.intro-layout #startARDiv,
+.intro-layout #unity-fullscreen-button { display: none; }
+
+#web-player:fullscreen { --player-height: 100vh; inset: 0; width: 100%; height: 100%; }
+#web-player:-webkit-full-screen { --player-height: 100vh; inset: 0; width: 100%; height: 100%; }
+
+#unity-container {
+    grid-area: 1 / 1;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+}
+
+.intro-layout #unity-container {
+    place-self: center;
+    width: min(100%, calc((var(--player-height) -
+        env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9));
+    aspect-ratio: 16 / 9;
+}
+
+#unity-canvas, #video-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#unity-canvas { z-index: 1; touch-action: none; }
+#video-canvas { pointer-events: none; }
+
+/* The SDK inserts this offscreen canvas for its OpenCV input. */
+#videoCapture { display: none; }
+
+.ctaDiv {
+    grid-area: 1 / 1;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fffa;
+}
+
+#unity-loading-bar { z-index: 2; pointer-events: none; }
+
+#unity-fullscreen-button {
+    position: absolute;
+    right: max(4px, env(safe-area-inset-right));
+    bottom: max(4px, env(safe-area-inset-bottom));
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    background: url('fullscreen-button.png') no-repeat center;
+    cursor: pointer;
+}
+
+#screenshotImg {
+    display: block;
+    max-width: 80vw;
+    max-height: calc(var(--player-height) * .7);
+    width: auto;
+    height: auto;
+}
+
+#unity-loading-bar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: none }
+.intro-layout #unity-loading-bar { display: block; }
+.intro-layout #unity-loading-bar[hidden] { display: none; }
+#unity-progress-bar-empty { width: 141px; height: 18px; background: url('progress-bar-empty-light.png') no-repeat center }
+#unity-progress-bar-full { width: 0%; height: 18px; background: url('progress-bar-full-light.png') no-repeat center }

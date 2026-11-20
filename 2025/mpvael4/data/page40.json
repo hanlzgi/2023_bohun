@@ -1,0 +1,55 @@
+{
+  "title": "제주항일기념관",
+  "headerButton": "독립",
+  "mainImage": "images/019_mpva_main.jpg",
+  "description": "<b>조천만세운동</b> 등 제주 지역의 항일독립운동에 관한 역사를 알 수 있는 곳으로 관련 역사적 자료가 전시되어 있으며, <b>애국선열추모탑</b>을 비롯해 <b>창열사, 3·1독립운동기념탑</b> 등의 시설물이 있다.",
+  "tags": [
+    "#법정사",
+    "#조천_미밋동산",
+    "#해녀"
+  ],
+  "location": "제주특별자치도 제주시 조천읍 신북로 303",
+  "mainlink": "https://www.jeju.go.kr/hangil/index.htm",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 제주도 3대 항일운동에 대해 알아보자!",
+        "② 제주에서 처음 만세운동의 물결이 시작된 곳에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "제주도 3대 항일운동",
+      "cards": [
+        {
+          "image": "images/019_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=dbuRJKGBlFo"
+        }
+      ]
+    },
+    {
+      "title": "조천만세동산",
+      "cards": [
+        {
+          "image": "images/019_mpva_section2.png",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/222277130446?trackingCode=blog_bloghome_searchlist"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3325.45139442576!2d126.64016797641203!3d33.54164647335353!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x350d1dd0cbb4da91%3A0xfb9f380d43144d9c!2z7KCc7KO87ZWt7J286riw64WQ6rSA!5e0!3m2!1sko!2skr!4v1748566663685!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/yD8gfe7JT28Hwbhv8"
+        }
+      ]
+    }
+  ]
+}

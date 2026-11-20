@@ -1,0 +1,54 @@
+{
+  "title": "효창공원",
+  "headerButton": "독립",
+  "mainImage": "images/043_mpva_main.jpg",
+  "description": "조국의 독립을 위해 피와 땀을 바친 <b>애국선열들의 영혼이 잠든 곳</b>이다. <b>백범 김구 선생 묘역, 삼의사 묘역, 임정요인 묘역</b> 등이 있으며, 1989년 사적 제330호로 지정된 국가지정문화재이다.",
+  "tags": [
+    "#독립운동의_성지",
+    "#임시정부_요인_차이석"
+  ],
+  "location": "서울특별시 용산구 효창원로 177-18",
+  "mainlink": "https://www.hyochangpark.com/",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 독립운동의 성지로 불리는 공원에 대해 알아보자!",
+        "② 강인한 정신력으로 임시정부를 지킨 인물에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "효창공원",
+      "cards": [
+        {
+          "image": "images/043_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=F0XLMUDx4eI"
+        }
+      ]
+    },
+    {
+      "title": "차이석(차리석)",
+      "cards": [
+        {
+          "image": "images/043_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://e-gonghun.mpva.go.kr/user/IndepCrusaderDetail.do?goTocode=20003&mngNo=10304"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3163.425058988718!2d126.95773927655516!3d37.54504817204413!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca273520df6ff%3A0xa306964695fa64a5!2z7Zqo7LC96rO17JuQ!5e0!3m2!1sko!2skr!4v1748566880747!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/PZeU9gs7tyKdRddD7"
+        }
+      ]
+    }
+  ]
+}

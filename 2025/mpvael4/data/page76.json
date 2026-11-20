@@ -1,0 +1,54 @@
+{
+  "title": "장사상륙작전전승기념관",
+  "headerButton": "호국",
+  "mainImage": "images/064_mpva_main.jpg",
+  "description": "1950년 9월 15일, 학도병 위주로 구성된 유격대가 인천상륙작전을 성공시키기 위해 북한군의 보급로를 차단한 <b>장사상륙작전</b>을 기념하는 공간으로, 국내 유일의 바다 위 호국 전시관이다.",
+  "tags": [
+    "#장사상륙작전",
+    "#학도병"
+  ],
+  "location": "경상북도 영덕군 남정면 동해대로 3560",
+  "mainlink": "https://stay.yd.go.kr/jangsa/pages/index.htm",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 인천상륙작전을 위한 또 하나의 상륙작전에 대해 알아보자!",
+        "② 장사상륙작전에 투입된 학도병에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "장사상륙작전",
+      "cards": [
+        {
+          "image": "images/064_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://m.blog.naver.com/PostView.naver?blogId=mpvalove&logNo=222874445800&referrerCode=0&searchKeyword=%EC%9E%A5%EC%82%AC%EC%83%81%EB%A5%99%EC%9E%91%EC%A0%84"
+        }
+      ]
+    },
+    {
+      "title": "학도병",
+      "cards": [
+        {
+          "image": "images/064_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=XRtFeLEahbg"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12865.30028215375!2d129.36860622731376!3d36.28016165805725!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35672135f9a50afd%3A0x3a9ee1ffaba8b775!2z7J6l7IKs7IOB66WZ7J6R7KCEIOyghOyKueq4sOuFkOq0gA!5e0!3m2!1sko!2skr!4v1747925958435!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/3nP4DF1PxXufKM6g7"
+        }
+      ]
+    }
+  ]
+}

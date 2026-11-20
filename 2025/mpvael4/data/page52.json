@@ -1,0 +1,54 @@
+{
+  "title": "지평의병·지평리전투기념관",
+  "headerButton": "독립/호국",
+  "mainImage": "images/097_mpva_main.jpg",
+  "description": "경기도 양평군 지평 지역은 <b>전국 최초로 의병을 일으킨 곳</b>으로, 1951년 유엔군이 중공군의 대규모 공격을 막아낸 <b>지평리 전투</b>가 있었던 곳이기도 하다. 이를 기리기 위해 세워진 기념관이다.",
+  "tags": [
+     "#프레드릭_아서_맥켄지", 
+     "#지평리전투"   
+  ],
+  "location": "경기도 양평군 지평면 지평로 357",
+  "mainlink": "https://www.yp21.go.kr/war/index.do",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 영국 종군기자가 바라본 의병의 모습은 어떠했을까?",
+        "② 1951년 2월 13일 유엔군과 중국군이 격돌한 전투에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "프레드릭 아서 맥켄지",
+      "cards": [
+        {
+          "image": "images/097_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.kocis.go.kr/koreanet/view.do?seq=1013266"
+        }
+      ]
+    },
+    {
+      "title": "지평리전투",
+      "cards": [
+        {
+          "image": "images/097_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=dzkWl2U9dOU"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12664.947827037138!2d127.62708402796073!3d37.47873428328235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3563401fe4cd16cd%3A0x99ca402d144188f!2z7KeA7Y-J7J2Y67ORIOyngO2PieumrOyghO2IrOq4sOuFkOq0gA!5e0!3m2!1sko!2skr!4v1747926873462!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/oKq69YjVToxDVEvy6"
+        }
+      ]
+    }
+  ]
+}

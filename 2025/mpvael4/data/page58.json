@@ -1,0 +1,55 @@
+{
+  "title": "국립공군박물관",
+  "headerButton": "호국",
+  "mainImage": "images/073_mpva_main.jpg",
+  "description": "<b>우리나라 공군의 역사</b>를 소개하는 공간으로 공군사관학교 안에 있다. 항공기를 이용한 <b>독립운동과 6·25전쟁</b>, 전력 증강, 인재양성 등 국가수호를 위해 애쓴 공군의 활약상을 전시하고 있다.",
+  "tags": [
+    "#승호리_철교_차단_작전",
+    "#노백린",
+    "#한인비행사양성소"
+  ],
+  "location": "충청북도 청주시 상당구 남일면 단재로 635",
+  "mainlink": "https://rokaf.airforce.mil.kr/sites/museum/index.do",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 6·25전쟁 당시 우리 공군은 어떤 활약을 했을까?",
+        "② 항일 공군 양성에 앞장선 인물에 대해 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "승호리 철교 차단 작전",
+      "cards": [
+        {
+          "image": "images/073_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=7y2X64CgJwk"
+        }
+      ]
+    },
+    {
+      "title": "노백린",
+      "cards": [
+        {
+          "image": "images/073_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/223329876984?trackingCode=blog_bloghome_searchlist"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3203.8296066077537!2d127.52262337651938!3d36.5823237723101!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3565269dc57a6651%3A0x19af00a7becc9448!2z6rWt66a96rO16rWw67CV66y86rSA!5e0!3m2!1sko!2skr!4v1748567199637!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/2t9UVqXNV6Gp9Kit5"
+        }
+      ]
+    }
+  ]
+}

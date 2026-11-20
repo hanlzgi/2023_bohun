@@ -1,0 +1,54 @@
+{
+  "title": "전쟁기념관",
+  "headerButton": "호국",
+  "mainImage": "images/074_mpva_main.png",
+  "description": "<b>전쟁의 역사</b>와 <b>호국전쟁에 관한 자료들을 보존·전시</b>하고, 조국을 위해 헌신한 선열들의 희생과 업적을 기리기 위한 기념관이다. 다양한 계층을 위한 교육프로그램과 문화행사를 운영한다.",
+  "tags": [
+    "#6·25전쟁일",
+    "#유틀란디아호"
+  ],
+  "location": "서울특별시 용산구 이태원로 29",
+  "mainlink": "https://www.warmemo.or.kr:8443/",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 6·25전쟁을 잊어선 안 되는 이유를 알기 위해 전개과정을 알아보자!",
+        "② 1953년 덴마크 의료지원선 유틀란디아호의 활동 모습을 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "6·25전쟁의 전개 과정",
+      "cards": [
+        {
+          "image": "images/074_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.bohun.or.kr/upload/bohunedu/digitaltextbook/narasarangDay/mpvael3.html#page=32"
+        }
+      ]
+    },
+    {
+      "title": "유틀란디아호",
+      "cards": [
+        {
+          "image": "images/074_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=tMVsU48LCmU&list=PLzc9CaqJfyVS17KJZZJuNg5mmb9Wntx8X&index=27"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3163.783270849261!2d126.9726336!3d37.5366059!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca23fb451c4f1%3A0xe196919c152a17a0!2z7KCE7J-B6riw64WQ6rSA!5e0!3m2!1sko!2skr!4v1749145807843!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/f67jpnsu11MN3QKP8"
+        }
+      ]
+    }
+  ]
+}

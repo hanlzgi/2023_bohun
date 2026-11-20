@@ -1,0 +1,54 @@
+{
+  "title": "국립제주호국원",
+  "headerButton": "호국",
+  "mainImage": "images/107_mpva_main.jpg",
+  "description": "대한민국을 위해 헌신하신 순국선열과 호국영령이 잠들어 계시는 곳으로, 독립유공자 뿐 아니라 호국, 민주유공자까지 안장되는 <b>제주 최초의 국립묘지</b>이다.",
+  "tags": [
+    "#제주특별자치도",
+    "#경찰영웅_문형순_서장"
+  ],
+  "location": "제주특별자치도 제주시 1100로 2558-73",
+  "mainlink": "https://www.mpva.go.kr/jjnc/index.do",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 제주 최초의 호국원에 대해 알아보자!",
+        "② 58년 만에 국립묘지로 안장되게 된 경찰 영웅의 사연을 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "국립제주호국원 소개",
+      "cards": [
+        {
+          "image": "images/107_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=SqOgD9EwS1A"
+        }
+      ]
+    },
+    {
+      "title": "경찰영웅 문형순 서장",
+      "cards": [
+        {
+          "image": "images/107_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=_WgsLzgQSbw"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3330.421591715517!2d126.49187677640755!3d33.41225137340464!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x350cf910ab4b0c47%3A0xacb8bac37ec788a7!2z6rWt66a97KCc7KO87Zi46rWt7JuQ!5e0!3m2!1sko!2skr!4v1748542640326!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/ptLUd5JiTiCR2ffN9"
+        }
+      ]
+    }
+  ]
+}

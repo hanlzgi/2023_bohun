@@ -1,0 +1,54 @@
+{
+  "title": "춘천지구전적기념관",
+  "headerButton": "호국",
+  "mainImage": "images/051_mpva_main.jpg",
+  "description": "6·25 전쟁 당시 <b>중부전선의 요충지였던 춘천</b>을 지키기 위해 싸우다 희생된 용사들을 기리고, 유엔군과 함께 치열한 전투 끝에 승리한 <b>춘천전투</b>의 의미를 기념하고자 건립된 공간이다.",
+  "tags": [
+    "#국군_최초의_승리",
+    "#한국군 6사단"
+  ],
+  "location": "강원특별자치도 춘천시 수변공원길 45",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?sid=2044&memorialType=true&gubunCode=ALL&pageIndex=1&searchCondition=%EC%A0%9C%EB%AA%A9&searchKeyword=%EC%B6%98%EC%B2%9C%EC%A7%80%EA%B5%AC",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 북한군의 춘천 점령을 3일 동안 지연시킨 전투에 대해 알아보자!",
+        "② 춘천전투에서 북한군의 전진을 지연시킨 부대를 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "춘천전투",
+      "cards": [
+        {
+          "image": "images/051_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=skzSswD-_Gc"
+        }
+      ]
+    },
+    {
+      "title": "한국군 6사단",
+      "cards": [
+        {
+          "image": "images/051_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=Gg04yPXzhZk"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3149.4206696277693!2d127.70228697656746!3d37.87384377196069!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3562e68ac03576fb%3A0x7208affdeb75e3b2!2z7LaY7LKc7KeA6rWs7KCE7KCB6riw64WQ6rSA!5e0!3m2!1sko!2skr!4v1748567124320!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/DYcekQA7BYKX6JyR6"
+        }
+      ]
+    }
+  ]
+}

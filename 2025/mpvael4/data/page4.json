@@ -1,0 +1,54 @@
+{
+  "title": "고성 독립운동 근거지 - 옥천사",
+  "headerButton": "독립",
+  "mainImage": "images/018_mpva_main.jpg",
+  "description": "신라시대 의상대사가 창건한 사찰로 일제강점기에 <b>경남지역 애국지사들의 주요한 활동 거점</b>이 된 곳이며, 특히 승려 신화수, 한봉진은 군자금 모집 등 독립운동에 적극 나서 활동하였다.",
+  "tags": [
+    "#호국사찰",
+    "#한봉진"
+  ],
+  "location": "경상남도 고성군 개천면 연화산1로 471-9",
+  "mainlink": "http://okcheonsa.or.kr/",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 독립운동가들의 피신처였던 옥천사에 대해 알아보자!",
+        "② 옥천사 승려 중 독립운동에 참여한 사람은 누구일까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "호국사찰",
+      "cards": [
+        {
+          "image": "images/018_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.donga.com/news/article/all/20190928/97627415/1"
+        }
+      ]
+    },
+    {
+      "title": "한봉진",
+      "cards": [
+        {
+          "image": "images/018_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://search.i815.or.kr/dictionary/detail.do?searchWord=&reSearchWord=&searchType=all&index=1&id=15191"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13060.274504895684!2d128.25339817668691!3d35.08001802637917!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x356ee6efdfa9209b%3A0xa9e180877cfe7dfb!2z6rOg7ISxIOyYpeyynOyCrA!5e0!3m2!1sko!2skr!4v1747924953232!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/y8K3YRtU2whRP4aj9"
+        }
+      ]
+    }
+  ]
+}

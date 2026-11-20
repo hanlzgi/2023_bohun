@@ -1,0 +1,55 @@
+{
+  "title": "국립3·15민주묘지",
+  "headerButton": "민주",
+  "mainImage": "images/088_mpva_main.jpg",
+  "description": "3·15 부정선거에 맞서 마산에서 일어난 <b>3·15의거</b>의 민주영웅들이 잠든 <b>국립민주묘지</b>로, 자유와 정의를 외치다 희생한 선열들의 혼이 깃든 <b>민주주의의 성지</b>이다.",
+  "tags": [
+    "#3·15의거_기념일",
+    "#마산고",
+    "#김영준_김용실"
+  ],
+  "location": "경상남도 창원시 마산회원구 3·15성역로 75",
+  "mainlink": "https://www.mpva.go.kr/315/index.do",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 국가기념일로 제정된 3·15의거에 대해 알아보자!",
+        "② 3·15의거에 참여했던 마산고 학생들의 이야기를 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "3·15의거의 원인과 전개과정",
+      "cards": [
+        {
+          "image": "images/088_mpva_section1.png",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.bohun.or.kr/upload/bohunedu/digitaltextbook/narasarangDay/mpvael3.html#page=61"
+        }
+      ]
+    },
+    {
+      "title": "김용실 열사/김영준 열사",
+      "cards": [
+        {
+          "image": "images/088_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=UNFSL019RQw"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1668166.3032590018!2d126.28041509375005!3d35.25283960000004!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x356f33b38b7b43eb%3A0x7d565c56beabc596!2z7LC97JuQIOq1reumvTMuMTXrr7zso7zrrJjsp4A!5e0!3m2!1sko!2skr!4v1748567997354!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/RD5C6mQCVRPWeeDe9"
+        }
+      ]
+    }
+  ]
+}

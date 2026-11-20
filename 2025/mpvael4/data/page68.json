@@ -1,0 +1,54 @@
+{
+  "title": "순직철도인 위령원",
+  "headerButton": "호국",
+  "mainImage": "images/057_mpva_main.jpg",
+  "description": "6·25전쟁에 참전하였다가 돌아가신 <b>철도인</b>의 희생을 후대에 널리 알리고 그 가족들을 위로하기 위해 충북 옥천군 청도성역 안에 조성된 공간으로, 이후에도 철도를 위해 일하다 순직하신 분들이 봉안되고 있다.",
+  "tags": [
+    "#철도 용사",
+    "#경부선_이원역"
+  ],
+  "location": "충청북도 옥천군 이원면 이원로 633",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?sid=1026&memorialType=true&gubunCode=ALL&pageIndex=1&searchCondition=%EC%A0%9C%EB%AA%A9&searchKeyword=%EC%9C%84%EB%A0%B9%EC%9B%90",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 6·25전쟁 속 숨은 영웅, 참전 철도인에 대해 알아보자!",
+        "② 이원역에서 순직철도인 위령원을 찾아가 볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "철도용사",
+      "cards": [
+        {
+          "image": "images/057_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=Ug5MtbQQ-pM"
+        }
+      ]
+    },
+    {
+      "title": "경부선 이원역",
+      "cards": [
+        {
+          "image": "images/057_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=mpqRAe4HQEw"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3218.437449625355!2d127.6220098763735!3d36.228866099696276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35654213c44456a7%3A0x87778dbbd5533061!2z7Lap7LKt67aB64-EIOyYpeyynOq1sCDsnbTsm5DrqbQg7J207JuQ66GcIDYzMw!5e0!3m2!1sko!2skr!4v1748326252168!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/NQCDQPTYMBNfhUNdA"
+        }
+      ]
+    }
+  ]
+}

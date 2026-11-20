@@ -1,0 +1,57 @@
+{
+  "title": "제주해녀 항일운동 기념탑",
+  "headerButton": "독립",
+  "mainImage": "images/031_mpva_main.jpg",
+  "description": "1932년 1월, 제주시 일대에서 일제의 식민지 수탈과 차별에 맞서 대규모 항일운동이 일어났다. 당시 운동에 참여한 해녀들의 2차 집결지에 해녀들의 항일정신을 기리기 위한 기념탑과 공원이 조성되었다.",
+  "tags": [
+    "#제주해녀",
+    "#항일운동",
+    "#부춘화",
+    "#김옥련",
+    "#부덕량"
+  ],
+  "location": "제주특별자치도 제주시 구좌읍 해녀박물관길 26",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?gubunCode=ALL&sid=1667&pageIndex=1&searFacilgubun=&searTopicsort=&searAddr_sigun=&searMpvabranch=&searVR=&searInfo=&searGbn=tit&searTxt=%EC%A0%9C%EC%A3%BC%ED%95%B4%EB%85%80",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 제주의 해녀들이 일제에 맞서 일어난 이유를 알아보자!",
+        "② 제주 최대 규모의 항일운동은 누가 이끌었을까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "제주해녀 항일운동",
+      "cards": [
+        {
+          "image": "images/031_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://blog.naver.com/mpvalove/222432368561"
+        }
+      ]
+    },
+    {
+      "title": "부춘화/김옥련/부덕량",
+      "cards": [
+        {
+          "image": "images/031_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://youtu.be/4TM17TdJIog?si=M2pjviOom8-S4ju5"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3326.2245548646133!2d126.8608168762749!3d33.521546845565126!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x350d1676d8177109%3A0x66db3a08e712df53!2z7KCc7KO87ZW064WA7ZWt7J287Jq064-Z6riw64WQ7YOR!5e0!3m2!1sko!2skr!4v1747392900363!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/8pjFBgX1sSZSGisu7"
+        }
+      ]
+    }
+  ]
+}

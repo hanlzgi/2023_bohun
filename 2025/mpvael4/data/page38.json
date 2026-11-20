@@ -1,0 +1,56 @@
+{
+  "title": "전해산기념관",
+  "headerButton": "독립",
+  "mainImage": "images/010_mpva_main.jpg",
+  "description": "1907년 일본이 <b>대한제국 군대를 해산</b>한 뒤 전국 각지에서 의병 활동이 일어나는 가운데, 남원·광주·나주·부안·순창 등지에서 활약하며 <b>호남 의병의 정신적 지주</b>였던 <b>의병장 전해산</b>의 애국정신을 기리는 곳이다.",
+  "tags": [
+    "#해산_전수용",
+    "#호남_의병_정신적_지주",
+    "#대동창의단",
+    "#호남동의단"
+  ],
+  "location": "전북특별자치도 장수군 번암면 성암길 92",
+  "mainlink": "http://mfis.mpva.go.kr/memorial/movementView.do?sid=666&memorialType=true&gubunCode=ALL&pageIndex=1&searchCondition=%EC%A0%9C%EB%AA%A9&searchKeyword=%EC%A0%84%ED%95%B4%EC%82%B0",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 호남 의병의 정신적 지주였던 인물에 대해 알아보자!",
+        "② 대동창의단을 결성하는 등 의병 활동에 대한 내용을 살펴볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "해산 전수용",
+      "cards": [
+        {
+          "image": "images/010_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=PSnKzzIfCns&t=17s"
+        }
+      ]
+    },
+    {
+      "title": "전해산의 의병 활동",
+      "cards": [
+        {
+          "image": "images/010_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "http://www.jbkb815.or.kr/web/page.php?pcode=DA&webtoon_code=19bb3ca8caeeefe4c8e7426796f34632"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3248.0993619496476!2d127.53503917634976!3d35.50182123980784!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x356fcd005af717e7%3A0x4c2d72080ec98254!2z7KCE7ZW07IKw6riw64WQ6rSA!5e0!3m2!1sko!2skr!4v1748328290276!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/hZGz51DX2G4iBart9"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "title": "5·18민주평화기념관(구 전남도청)",
+  "headerButton": "민주",
+  "mainImage": "images/093_mpva_main.jpg",
+  "description": "<b>5·18민주화운동</b>을 기념하고자 <b>옛 전남도청</b>의 전남지방경찰청 본관과 민원실, 전남도청 본관과 회의실, 상무관을 리모델링하여 총 5개의 기념관으로 구성하였고, 관련 자료와 전시물을 전시하고 있다.",
+  "tags": [
+    "#5·18민주화운동",
+    "#전남도청"
+  ],
+  "location": "광주광역시 동구 문화전당로 38",
+  "mainlink": "https://www.acc.go.kr/main/contents.do?PID=06020201",
+  "moreButtonText": "시설 더 알아보기",
+  "questions": [
+    {
+      "title": "한 걸음 더",
+      "answers": [
+        "① 1980년 5월 광주에서는 무슨 일이 있었는지 알아보자!",
+        "② 5·18민주화운동의 최후 항쟁지 전남도청의 모습을 알아볼까?"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "5·18민주화운동",
+      "cards": [
+        {
+          "image": "images/093_mpva_section1.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.bohun.or.kr/upload/bohunedu/digitaltextbook/textbookMiddle/mpvamid2.html#page=40"
+        }
+      ]
+    },
+    {
+      "title": "전남도청",
+      "cards": [
+        {
+          "image": "images/093_mpva_section2.jpg",
+          "moreButtonText": "설명 보기",
+          "sectionlink": "https://www.youtube.com/watch?v=7Q9gtDJhvYg"
+        }
+      ]
+    },
+    {
+      "title": "어디에 있을까?",
+      "cards": [
+        {
+          "mapimage": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1631.1984515901026!2d126.91927094732776!3d35.14672097100073!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x35718c84e9405b5d%3A0xc4d76114a8db3e8c!2z6rSR7KO8IOyghOudvOuCqOuPhOyyrSDqtawg67O46rSA!5e0!3m2!1sko!2skr!4v1749146207923!5m2!1sko!2skr",
+          "moreButtonText": "위치 보기",
+          "maplink": "https://maps.app.goo.gl/1JZhbMnqYU6HPS7C9"
+        }
+      ]
+    }
+  ]
+}

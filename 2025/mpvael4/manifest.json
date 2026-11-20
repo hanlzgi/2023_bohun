@@ -1,0 +1,47 @@
+{
+  "name": "방방곡곡 나라사랑 전자책",
+  "short_name": "나라사랑책",
+  "description": "역사적 장소와 독립 운동 이야기를 담은 전자책",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#1a73e8",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "lang": "ko",
+  "categories": ["education", "books", "reference"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%231a73e8'/><text x='96' y='120' font-size='120' text-anchor='middle' fill='white'>📚</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%231a73e8'/><text x='256' y='320' font-size='320' text-anchor='middle' fill='white'>📚</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "첫 페이지로",
+      "short_name": "첫 페이지",
+      "description": "전자책 첫 페이지로 이동",
+      "url": "./index.html#page=1",
+      "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>", "sizes": "any"}]
+    },
+    {
+      "name": "독립 보훈시설",
+      "short_name": "독립",
+      "description": "독립 보훈시설 섹션으로 이동",
+      "url": "./index.html#page=3",
+      "icons": [{"src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇰🇷</text></svg>", "sizes": "any"}]
+    }
+  ]
+}
