@@ -7,8 +7,14 @@
     <title>AR_GPS</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
-    <link rel="stylesheet" href="cho2-webgl.css">
-<script src="cho2-webgl.js"></script>
+    <link rel="manifest" href="manifest.webmanifest" type="application/manifest+json">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="추모의 나침반">
+<link rel="stylesheet" href="cho2-webgl.css?v=mode1">
+<script src="cho2-webgl.js?v=mode1"></script>
+<script>document.documentElement.classList.add("cho2-webgl")</script>
     <style>
         html{
             height: -webkit-fill-available;
@@ -96,7 +102,10 @@
       }
       loadingCover.style.display = "none";
       if (window.Cho2WebGL) {
+        const intro = document.getElementById("startARDiv");
+        if (intro) intro.style.display = "none";
         window.Cho2WebGL.mount({canvas, config, loaderUrl, loadingCover, progressBarEmpty, progressBarFull, fullscreenButton, spinner});
+        window.Cho2WebGL.start();
       }
       function StartAR() {
       if (window.Cho2WebGL) return window.Cho2WebGL.start();

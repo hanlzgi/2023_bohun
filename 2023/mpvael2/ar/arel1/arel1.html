@@ -2,11 +2,12 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content='width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=yes'>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=yes">
     <title>Unity WebGL Player | AR_elementary</title>
+    <link rel="icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <style>
-        html{
+        html {
             height: -webkit-fill-available;
         }
         body {
@@ -16,6 +17,49 @@
             min-height: -webkit-fill-available;
             width: 100vw;
             overflow: hidden;
+            background: #000;
+            touch-action: none;
+        }
+        #unity-container {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            border: 0;
+            overflow: hidden;
+        }
+        #unity-canvas {
+            width: 100% !important;
+            height: 100% !important;
+            background: #000 !important;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        /* Imagine SDK가 video-canvas 크기/표시를 관리한다. 강제로 cover 덮어쓰지 않는다. */
+        #video-canvas {
+            pointer-events: none;
+        }
+        #unity-loading-bar {
+            z-index: 2;
+        }
+        /* 카메라 검사 중에는 게이트를 숨기고, 필요할 때만 표시 */
+        #startARDiv {
+            display: none;
+        }
+        /* Unity 로고 제거 — 진행률 바만 유지 */
+        #unity-logo {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: none !important;
+        }
+        #unity-footer,
+        #unity-webgl-logo,
+        #unity-build-title {
+            display: none !important;
         }
         .ctaDiv {
             display: flex;
@@ -29,6 +73,51 @@
             bottom: 0;
             background: #fffa;
             z-index: 99;
+            gap: 12px;
+        }
+        #rotateHintDiv {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.78);
+            z-index: 9999;
+            pointer-events: none;
+            color: #fff;
+            text-align: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        #rotateHintDiv p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.5;
+            width: min(80vw, 360px);
+        }
+        #retryCamButton,
+        #continuePcButton {
+            display: none;
+            margin-top: 8px;
+            padding: 10px 18px;
+            font-size: 15px;
+        }
+        #cameraDebugText {
+            display: none;
+            margin-top: 10px;
+            max-width: 90vw;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            word-break: break-all;
+            text-align: left;
+            background: #fff8;
+            padding: 8px 10px;
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -41,13 +130,19 @@
 		<imagetarget id='cho3_marker' src='targets/marker_cho3.png'></imagetarget>
 		<imagetarget id='mid3_hakdo' src='targets/letter-01.png'></imagetarget>
 
-    <video id="webcam-video" muted autoplay playsinline style="width:1px;position:absolute"></video>
-    <!-- <video id="webcam-video" muted autoplay playsinline style="width:100%; height:100%; object-fit:cover; position:absolute"></video> -->
-    <canvas id="video-canvas" style="width:100%; height:100%; object-fit:cover; position:absolute"></canvas>
-    <div id="startARDiv" class="ctaDiv">
+    <!-- Android Chrome은 1px 숨김 video에서 videoWidth=0이 되는 경우가 있어 오프스크린 실 크기를 둔다 -->
+    <video id="webcam-video" muted autoplay playsinline webkit-playsinline
+        style="position:fixed;left:-10000px;top:0;width:320px;height:240px;opacity:0;pointer-events:none"></video>
+    <div id="rotateHintDiv" aria-hidden="true">
+        <p>화면을 가로로 돌려주세요.<br>방향 잠금이 지원되지 않는 환경에서는<br>기기를 직접 가로로 회전해 주세요.</p>
+    </div>
+    <div id="startARDiv" class="ctaDiv" style="display:none">
         <select id="chooseCamSel" style="display: none;" onchange="SelectCam()"></select>
-        <p style="text-align: center; width:60vw;">AR 콘텐츠를 체험하려면<br>장치의 카메라 기능을 사용하도록 허락해주세요.</p>
-        <button id="startARButton" onclick="StartAR(false)" style="display:none">장치 사용</button>
+        <p id="startARText" style="text-align: center; width:60vw;">AR 콘텐츠를 체험하려면<br>장치의 카메라 기능을 사용하도록 허락해주세요.</p>
+        <pre id="cameraDebugText"></pre>
+        <button id="startARButton" type="button" style="display:none">장치 사용</button>
+        <button id="retryCamButton" type="button">카메라 다시 시도</button>
+        <button id="continuePcButton" type="button">PC 모드로 계속</button>
     </div>
     <div id="screenshotDiv" style="display: none;" class="ctaDiv">
         <div style="position:relative; background-color:white; padding:10px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3), 0 6px 20px 0 rgba(0, 0, 0, 0.25);">
@@ -68,60 +163,658 @@
         <p id="errorText" style="text-align: center; width:60vw; color:white"></p>
     </div>
     <div id="unity-container" class="unity-mobile">
-        <canvas id="unity-canvas" style="width: 100%; height: 100%; background: #0000; z-index: -99"></canvas>
+        <canvas id="unity-canvas" style="width: 100%; height: 100%; background: #000; z-index: 1"></canvas>
         <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
             <div id="unity-progress-bar-empty">
                 <div id="unity-progress-bar-full"></div>
             </div>
         </div>
+        <!-- Imagine ImageTracker 캡처 캔버스 (SDK가 크기/표시 제어) -->
         <canvas id="video-canvas"></canvas>
     </div>
     <script src="arcamera.js" type="text/javascript"></script>
     <script src="itracker.js" type="text/javascript"></script>
     <script src="Build/초1_31독립선언서.loader.js"></script>
     <script>
-            var initialize = async() =>{
-                var unityCanvas = document.querySelector("#unity-canvas");
-                var videoCanvas = document.querySelector("#video-canvas");
-                window.arCamera = new ARCamera(unityCanvas, videoCanvas);
-                window.iTracker = new ImageTracker(arCamera);
-                try{
-                    await window.iTracker.initialize();
-                    console.log("ImageTracker initialized!");
-                }
-                catch{
-                    console.error("Failed to initialize ImageTracker. Are you missing opencv.js? " + error);
-                    ShowError("Failed to initialize the experience.");
-                    return;
-                }
-                await LoadWebcams();
-                document.getElementById("startARButton").style.display = "block";
-            }
-            initialize();
             var isStart = false;
             var container = document.querySelector("#unity-container");
             var canvas = document.querySelector("#unity-canvas");
             var loadingBar = document.querySelector("#unity-loading-bar");
             var progressBarFull = document.querySelector("#unity-progress-bar-full");
-            document.addEventListener("visibilitychange", function() {
-                console.log("The game is " + document.visibilityState);
-                if(document.visibilityState=="visible")
-                {
-                    unityInstance.SendMessage('PCMode_Obj', 'WaitTouch');
-                }
-            });
-            function TouchStart()
-            {
-                isStart = true;
-                OpenFullscreen('landscape');
+            var startButton = document.getElementById("startARButton");
+            var retryCamButton = document.getElementById("retryCamButton");
+            var continuePcButton = document.getElementById("continuePcButton");
+            var startARText = document.getElementById("startARText");
+            var cameraDebugText = document.getElementById("cameraDebugText");
+            var unityReady = null;
+            var cameraPermission = null;
+            var webcamStarting = null;
+            var cameraState = "checking"; // checking|available|absent|denied|live|failed|play_failed|texture_failed
+            var viewMode = "ar"; // ar|manual
+            var sensorActive = false;
+            var sensorListening = false;
+            var lastOrientationSend = 0;
+            var userExitedFullscreen = false;
+            var pageSuspended = false;
+            var manualModeEntered = false;
+		window.unityFacingMode = "environment"
+            window.WEBCAM_SETTINGS = {
+                video: { facingMode: window.unityFacingMode },
+                audio: false
+            };
+            window.requestingForPermissions = false;
+            window.webcamStream = null;
+            // 모바일 디버깅용: 마지막 카메라 실패 단계/오류명
+            window.cameraDebug = { stage: "", name: "", message: "", detail: "" };
+            window.ITRACKER_GLOBALS = {
+                INTERNAL_SMOOTHFACTOR_POS: .075,
+            };
+            function isIOSDevice() {
+                var ua = navigator.userAgent.toLowerCase();
+                return ua.indexOf("iphone") > -1 ||
+                    ua.indexOf("ipad") > -1 ||
+                    ua.indexOf("ipod") > -1 ||
+                    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
             }
-            async function StartAR(isPC) {
-                canvas.style.width = window.innerWidth + "px";
-                canvas.style.height = window.innerHeight + "px";
-                
+            function isMobileDevice() {
+                var ua = navigator.userAgent.toLowerCase();
+                return isIOSDevice() || ua.indexOf("android") > -1 || ua.indexOf("mobile") > -1;
+            }
+            function isPortraitOrientation() {
+                if (window.matchMedia) {
+                    try {
+                        if (window.matchMedia("(orientation: portrait)").matches) return true;
+                        if (window.matchMedia("(orientation: landscape)").matches) return false;
+                    } catch (e) {}
+                }
+                return window.innerHeight > window.innerWidth;
+            }
+            function canLockOrientation() {
+                return !!(screen.orientation && typeof screen.orientation.lock === "function");
+            }
+            function fullscreenElement() {
+                return document.fullscreenElement || document.webkitFullscreenElement || null;
+            }
+            function getFullscreenTarget() {
+                return document.documentElement;
+            }
+            function fullscreenRequestFn() {
+                var el = getFullscreenTarget();
+                if (document.fullscreenEnabled && el.requestFullscreen) return el.requestFullscreen.bind(el);
+                if (document.webkitFullscreenEnabled && el.webkitRequestFullscreen) return el.webkitRequestFullscreen.bind(el);
+                return null;
+            }
+            function resizeUnityCanvas() {
+                if (!canvas) return;
+                var w = window.innerWidth;
+                var h = window.innerHeight;
+                if (window.visualViewport && window.visualViewport.scale === 1) {
+                    w = window.visualViewport.width;
+                    h = window.visualViewport.height;
+                }
+                canvas.style.width = w + "px";
+                canvas.style.height = h + "px";
+                // video-canvas 비트맵/CSS는 Imagine ARCamera.resize가 담당한다.
+            }
+            function getWebcamVideo() {
+                return document.getElementById("webcam-video");
+            }
+            function logCameraDiagnostics(label, video) {
+                var track = window.webcamStream && window.webcamStream.getVideoTracks()[0];
+                var settings = null;
+                try { settings = track && track.getSettings ? track.getSettings() : null; } catch (e) {}
+                console.log("[CameraDiag]", label, {
+                    hasStream: !!window.webcamStream,
+                    trackState: track ? track.readyState : null,
+                    trackLabel: track ? track.label : null,
+                    settings: settings,
+                    videoWidth: video ? video.videoWidth : 0,
+                    videoHeight: video ? video.videoHeight : 0,
+                    readyState: video ? video.readyState : -1,
+                    paused: video ? video.paused : null,
+                    srcObject: !!(video && video.srcObject)
+                });
+            }
+            function setCameraDebug(stage, err, detail) {
+                var name = "";
+                var message = "";
+                if (typeof err === "string") {
+                    message = err;
+                } else if (err) {
+                    name = err.name || "";
+                    message = err.message || String(err);
+                }
+                window.cameraDebug = {
+                    stage: stage || "",
+                    name: name,
+                    message: message,
+                    detail: detail || ""
+                };
+                console.warn("[CameraFail]", window.cameraDebug);
+            }
+            function cameraFailureUserMessage(state) {
+                switch (state) {
+                    case "denied":
+                        return "카메라 권한이 거부되었습니다.<br>브라우저 설정에서 카메라를 허용한 뒤 다시 시도해 주세요.";
+                    case "absent":
+                        return "이 기기에서 카메라를 찾지 못했습니다.<br>PC 모드로 계속할 수 있습니다.";
+                    case "play_failed":
+                        return "카메라는 연결됐지만 영상 재생에 실패했습니다.<br>다시 시도하거나 PC 모드로 계속할 수 있습니다.";
+                    case "texture_failed":
+                        return "카메라 영상 텍스처 연결에 실패했습니다.<br>다시 시도하거나 PC 모드로 계속할 수 있습니다.";
+                    case "overconstrained":
+                        return "요청한 카메라 설정(후면 등)을 지원하지 않습니다.<br>다른 설정으로 다시 시도해 주세요.";
+                    default:
+                        return "카메라 초기화에 실패했습니다.<br>다시 시도하거나 PC 모드로 계속할 수 있습니다.";
+                }
+            }
+            function showCameraFailureUI(state) {
+                var dbg = window.cameraDebug || {};
+                document.getElementById("startARDiv").style.display = "flex";
+                startARText.innerHTML = cameraFailureUserMessage(state || cameraState);
+                if (cameraDebugText) {
+                    cameraDebugText.style.display = "block";
+                    cameraDebugText.textContent =
+                        "실패단계: " + (dbg.stage || "-") + "\n" +
+                        "오류명: " + (dbg.name || "-") + "\n" +
+                        "메시지: " + (dbg.message || "-") +
+                        (dbg.detail ? ("\n상세: " + dbg.detail) : "");
+                }
+                startButton.style.display = "none";
+                if (retryCamButton) retryCamButton.style.display = "inline-block";
+                if (continuePcButton) continuePcButton.style.display = "inline-block";
+            }
+            function hideCameraFailureUI() {
+                if (retryCamButton) retryCamButton.style.display = "none";
+                if (continuePcButton) continuePcButton.style.display = "none";
+                if (cameraDebugText) {
+                    cameraDebugText.style.display = "none";
+                    cameraDebugText.textContent = "";
+                }
+            }
+            async function waitForVideoReady(video, timeoutMs) {
+                timeoutMs = timeoutMs || 10000;
+                if (!video) throw new Error("webcam video element missing");
+                video.muted = true;
+                video.defaultMuted = true;
+                video.autoplay = true;
+                video.playsInline = true;
+                video.setAttribute("muted", "");
+                video.setAttribute("playsinline", "");
+                video.setAttribute("webkit-playsinline", "");
+                // Android: 너무 작은 video는 메타데이터/프레임이 안 채워지는 경우 있음
+                if (!video.style.width || video.style.width === "1px") {
+                    video.style.width = "320px";
+                    video.style.height = "240px";
+                }
+                var playError = null;
+                try {
+                    var playResult = video.play();
+                    if (playResult && typeof playResult.then === "function") {
+                        await playResult;
+                    }
+                } catch (err) {
+                    playError = err;
+                    console.warn("video.play() failed:", err && err.name, err && err.message);
+                }
+                if (video.readyState < 2 || !video.videoWidth) {
+                    await Promise.race([
+                        new Promise(function (resolve) {
+                            var done = function () {
+                                video.removeEventListener("loadedmetadata", done);
+                                video.removeEventListener("loadeddata", done);
+                                video.removeEventListener("playing", done);
+                                resolve();
+                            };
+                            video.addEventListener("loadedmetadata", done);
+                            video.addEventListener("loadeddata", done);
+                            video.addEventListener("playing", done);
+                        }),
+                        new Promise(function (resolve) { setTimeout(resolve, timeoutMs); })
+                    ]);
+                }
+                // play 재시도 (메타데이터 이후)
+                if (video.paused || playError) {
+                    try {
+                        var playResult2 = video.play();
+                        if (playResult2 && typeof playResult2.then === "function") {
+                            await playResult2;
+                        }
+                        playError = null;
+                    } catch (err2) {
+                        playError = err2;
+                    }
+                }
+                var start = performance.now();
+                while ((!video.videoWidth || !video.videoHeight) && (performance.now() - start) < timeoutMs) {
+                    await new Promise(function (r) { setTimeout(r, 50); });
+                }
+                return {
+                    videoWidth: video.videoWidth,
+                    videoHeight: video.videoHeight,
+                    readyState: video.readyState,
+                    paused: video.paused,
+                    playError: playError
+                };
+            }
+            function updateRotateHint() {
+                var hint = document.getElementById("rotateHintDiv");
+                if (!hint) return;
+                var show = isMobileDevice() && isPortraitOrientation() && isStart;
+                hint.style.display = show ? "flex" : "none";
+                hint.setAttribute("aria-hidden", show ? "false" : "true");
+            }
+            function sendUnity(gameObject, method, arg) {
+                if (!window.unityInstance) return;
+                try {
+                    if (typeof arg === "undefined") {
+                        window.unityInstance.SendMessage(gameObject, method);
+                    } else {
+                        window.unityInstance.SendMessage(gameObject, method, arg);
+                    }
+                } catch (err) {
+                    console.warn("SendMessage failed:", gameObject, method, err);
+                }
+            }
+            function enterManualMode(reason, options) {
+                options = options || {};
+                viewMode = "manual";
+                cameraState = reason || cameraState;
+                console.log("Enter manual/PC mode:", reason, window.cameraDebug);
+                if (!manualModeEntered) {
+                    manualModeEntered = true;
+                    sendUnity("PCMode_Obj", "DisableARCam");
+                    sendUnity("PCMode_Obj", "EnableManualLook");
+                    sendUnity("PCMode_Obj", "ApplyPcCameraClear");
+                    if (!sensorActive) {
+                        sendUnity("PCMode_Obj", "SensorUnavailable");
+                    }
+                }
+                // 카메라 없음 자동 진입: 게이트 UI 없음
+                // 권한 거부/재생/텍스처 실패: 단계별 안내 + 재시도 + PC 계속
+                var showUi = options.showFailureUi;
+                if (typeof showUi === "undefined") {
+                    showUi = reason === "denied" || reason === "failed" ||
+                        reason === "play_failed" || reason === "texture_failed" ||
+                        reason === "overconstrained";
+                }
+                if (showUi) {
+                    showCameraFailureUI(reason);
+                }
+            }
+            function stopWebcamTracks() {
+                if (window.webcamStream) {
+                    try {
+                        window.webcamStream.getTracks().forEach(function (t) { t.stop(); });
+                    } catch (e) {}
+                    window.webcamStream = null;
+                }
+                var video = document.getElementById("webcam-video");
+                if (video) video.srcObject = null;
+            }
+            async function requestFullscreenOnly() {
+                if (userExitedFullscreen) return false;
+                if (fullscreenElement()) return true;
+                var req = fullscreenRequestFn();
+                if (!req) return false;
+                try {
+                    await req();
+                    return !!fullscreenElement();
+                } catch (err) {
+                    console.warn("Fullscreen request failed:", err && err.name, err && err.message);
+                    return false;
+                }
+            }
+            async function tryLockOrientation(type) {
+                if (!type || !canLockOrientation()) {
+                    console.log("screen.orientation.lock is not available on this device.");
+                    return false;
+                }
+                try {
+                    var lockPromise = screen.orientation.lock(type);
+                    if (lockPromise && typeof lockPromise.then === "function") {
+                        await lockPromise;
+                    }
+                    console.log("Orientation locked:", type);
+                    return true;
+                } catch (err) {
+                    console.warn("Orientation lock failed (ignored):", err && err.name, err && err.message);
+                    return false;
+                }
+            }
+            async function OpenFullscreen(type) {
+                // 전체화면과 방향 잠금 분리. 실패해도 Unity는 계속 실행.
+                if (!isIOSDevice()) {
+                    await requestFullscreenOnly();
+                }
+                if (isMobileDevice() && !isIOSDevice()) {
+                    await tryLockOrientation(type || "landscape");
+                }
+                updateRotateHint();
+                resizeUnityCanvas();
+            }
+            function TouchStart() {
+                isStart = true;
+                OpenFullscreen("landscape").catch(function (err) {
+                    console.warn("OpenFullscreen ignored error:", err && err.name, err && err.message);
+                });
+                // 사용자 제스처 시점에 센서 권한도 함께 요청 (카메라와 별개)
+                requestDeviceOrientation(true).catch(function (err) {
+                    console.warn("Sensor request ignored:", err && err.name, err && err.message);
+                });
+            }
+            function screenAngleDeg() {
+                if (screen.orientation && typeof screen.orientation.angle === "number") {
+                    return screen.orientation.angle;
+                }
+                return window.orientation || 0;
+            }
+            function onDeviceOrientation(event) {
+                if (!window.unityInstance || pageSuspended) return;
+                var now = performance.now();
+                if (now - lastOrientationSend < 33) return;
+                lastOrientationSend = now;
+                var alpha = event.alpha;
+                var beta = event.beta;
+                var gamma = event.gamma;
+                if (alpha == null || beta == null || gamma == null) return;
+                // iOS webkitCompassHeading으로 absolute 보정
+                if (typeof event.webkitCompassHeading === "number" && !isNaN(event.webkitCompassHeading)) {
+                    alpha = (360 - event.webkitCompassHeading);
+                }
+                var absolute = event.absolute ? 1 : 0;
+                var sample = [alpha, beta, gamma, screenAngleDeg(), absolute].join(",");
+                if (!sensorActive) {
+                    sensorActive = true;
+                    sendUnity("PCMode_Obj", "SensorAvailable");
+                }
+                sendUnity("PCMode_Obj", "HandleDeviceOrientation", sample);
+            }
+            async function requestDeviceOrientation(fromGesture) {
+                if (sensorListening) return sensorActive;
+                try {
+                    if (typeof DeviceOrientationEvent !== "undefined" &&
+                        typeof DeviceOrientationEvent.requestPermission === "function") {
+                        if (!fromGesture) return false;
+                        var permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission !== "granted") {
+                            console.warn("DeviceOrientation permission denied");
+                            sendUnity("PCMode_Obj", "SensorUnavailable");
+                            return false;
+                        }
+                    }
+                    window.addEventListener("deviceorientationabsolute", onDeviceOrientation, true);
+                    window.addEventListener("deviceorientation", onDeviceOrientation, true);
+                    sensorListening = true;
+                    // 샘플이 일정 시간 없으면 미지원으로 처리
+                    setTimeout(function () {
+                        if (!sensorActive) {
+                            sendUnity("PCMode_Obj", "SensorUnavailable");
+                        }
+                    }, 2000);
+                    return true;
+                } catch (err) {
+                    console.warn("DeviceOrientation setup failed:", err);
+                    sendUnity("PCMode_Obj", "SensorUnavailable");
+                    return false;
+                }
+            }
+            function stopDeviceOrientation() {
+                if (!sensorListening) return;
+                window.removeEventListener("deviceorientationabsolute", onDeviceOrientation, true);
+                window.removeEventListener("deviceorientation", onDeviceOrientation, true);
+                sensorListening = false;
+                sensorActive = false;
+            }
+            async function inspectCameras() {
+                cameraState = "checking";
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+                    cameraState = "absent";
+                    return cameraState;
+                }
+                try {
+                    var devices = await navigator.mediaDevices.enumerateDevices();
+                    var cams = devices.filter(function (d) { return d.kind === "videoinput"; });
+                    // OBS Virtual Camera만 있으면 실기기 카메라 없음으로 간주
+                    var realCams = cams.filter(function (d) {
+                        var label = (d.label || "").toLowerCase();
+                        return label.indexOf("obs") === -1 && label.indexOf("virtual") === -1;
+                    });
+                    if (cams.length === 0) {
+                        cameraState = "absent";
+                    } else if (realCams.length === 0 && cams.every(function (d) {
+                        var label = (d.label || "").toLowerCase();
+                        return label.indexOf("obs") > -1 || label.indexOf("virtual") > -1;
+                    })) {
+                        cameraState = "absent";
+                    } else {
+                        cameraState = "available";
+                    }
+                } catch (err) {
+                    console.warn("enumerateDevices failed:", err);
+                    cameraState = "uncertain";
+                }
+                return cameraState;
+            }
+            var initialize = async function () {
                 document.getElementById("startARDiv").style.display = "none";
-                createUnityInstance(document.querySelector("#unity-canvas"), {
+                var unityCanvas = document.getElementById("unity-canvas");
+                var videoCanvas = document.getElementById("video-canvas");
+                window.arCamera = new ARCamera(unityCanvas, videoCanvas);
+                window.iTracker = new ImageTracker(arCamera);
+                try {
+                    await window.iTracker.initialize();
+                    console.log("ImageTracker initialized!");
+                } catch (error) {
+                    console.error("Failed to initialize ImageTracker. Are you missing opencv.js? ", error);
+                    // 트래커 초기화 실패 → 안내 없이 PC 모드 자동 진입
+                    cameraState = "failed";
+                    StartAR(true);
+                    return;
+                }
+                await LoadWebcams();
+            };
+            async function LoadWebcams() {
+                var state = await inspectCameras();
+                var select = document.getElementById("chooseCamSel");
+                select.style.display = "none";
+                select.innerHTML = "";
+                document.getElementById("startARDiv").style.display = "none";
+                startButton.style.display = "none";
+                // 카메라 없음: HTML 게이트/시작 버튼 없이 즉시 PC 모드
+                if (state === "absent") {
+                    console.log("No camera detected — auto PC mode");
+                    StartAR(true);
+                    return;
+                }
+                try {
+                    var devices = await navigator.mediaDevices.enumerateDevices();
+                    var camDevices = [];
+                    devices.forEach(function (mediaDevice) {
+                        if (mediaDevice.kind !== "videoinput") return;
+                        var label = (mediaDevice.label || "").toLowerCase();
+                        if (label.indexOf("obs") > -1 || label.indexOf("virtual") > -1) return;
+                        if (window.unityFacingMode === "environment" && (mediaDevice.label || "").includes("facing front")) return;
+                        if (window.unityFacingMode === "user" && !(mediaDevice.label || "").includes("facing front") && mediaDevice.label) return;
+                        camDevices.push(mediaDevice);
+                    });
+                    camDevices = camDevices.reverse();
+                    if (camDevices.length === 0) {
+                        devices.forEach(function (mediaDevice) {
+                            if (mediaDevice.kind !== "videoinput") return;
+                            var label = (mediaDevice.label || "").toLowerCase();
+                            if (label.indexOf("obs") > -1 || label.indexOf("virtual") > -1) return;
+                            camDevices.push(mediaDevice);
+                        });
+                        camDevices = camDevices.reverse();
+                    }
+                    // 실카메라가 없으면 PC 자동 진입
+                    if (camDevices.length === 0) {
+                        cameraState = "absent";
+                        StartAR(true);
+                        return;
+                    }
+                    var count = 0;
+                    camDevices.forEach(function (mediaDevice) {
+                        var option = document.createElement("option");
+                        option.value = mediaDevice.deviceId;
+                        option.text = mediaDevice.label || ("Camera " + count);
+                        select.appendChild(option);
+                        count++;
+                    });
+                    if (select.options.length > 0) {
+                        iTracker.WEBCAM_NAME = select.options[select.selectedIndex].innerHTML;
+                    }
+                    // 카메라 있음: 사용자 제스처용 '장치 사용'만 표시
+                    startARText.innerHTML = "AR 콘텐츠를 체험하려면<br>장치의 카메라 기능을 사용하도록 허락해주세요.";
+                    startButton.textContent = "장치 사용";
+                    startButton.onclick = function () { StartAR(false); };
+                    startButton.style.display = "block";
+                    document.getElementById("startARDiv").style.display = "flex";
+                } catch (err) {
+                    console.error("Webcam Error — auto PC mode", err);
+                    cameraState = "failed";
+                    StartAR(true);
+                }
+            }
+            function SelectCam() {
+                var select = document.getElementById("chooseCamSel");
+                window.deviceId = select.value;
+                window.WEBCAM_SETTINGS.video["deviceId"] = window.deviceId;
+                iTracker.WEBCAM_NAME = select.options[select.selectedIndex].innerHTML;
+            }
+            async function tryGetUserMedia(label, constraints) {
+                console.log("[Camera] getUserMedia try:", label, JSON.stringify(constraints));
+                try {
+                    var stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    console.log("[Camera] getUserMedia ok:", label);
+                    return { ok: true, stream: stream, label: label };
+                } catch (err) {
+                    console.warn("[Camera] getUserMedia fail:", label, err && err.name, err && err.message);
+                    return { ok: false, err: err, label: label };
+                }
+            }
+            async function RequestWebcam() {
+                window.requestingForPermissions = true;
+                setCameraDebug("getUserMedia", "", "starting");
+                try {
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        cameraState = "absent";
+                        setCameraDebug("getUserMedia", { name: "NotSupportedError", message: "mediaDevices.getUserMedia unavailable" });
+                        window.requestingForPermissions = false;
+                        return null;
+                    }
+                    try {
+                        if (navigator.permissions && navigator.permissions.query) {
+                            var perm = await navigator.permissions.query({ name: "camera" });
+                            console.log("[Camera] permissions.query(camera):", perm && perm.state);
+                        }
+                    } catch (permErr) {
+                        console.log("[Camera] permissions.query unsupported:", permErr && permErr.message);
+                    }
+                    stopWebcamTracks();
+                    var facing = window.unityFacingMode || "environment";
+                    var attempts = [
+                        { label: "facingMode-string", constraints: { video: { facingMode: facing }, audio: false } },
+                        { label: "facingMode-ideal", constraints: { video: { facingMode: { ideal: facing } }, audio: false } },
+                        { label: "video-true", constraints: { video: true, audio: false } }
+                    ];
+                    if (window.deviceId) {
+                        attempts.unshift({
+                            label: "deviceId",
+                            constraints: { video: { deviceId: { ideal: window.deviceId } }, audio: false }
+                        });
+                    }
+                    var lastErr = null;
+                    var acquired = null;
+                    for (var i = 0; i < attempts.length; i++) {
+                        var result = await tryGetUserMedia(attempts[i].label, attempts[i].constraints);
+                        if (result.ok) {
+                            acquired = result;
+                            break;
+                        }
+                        lastErr = result.err;
+                        if (result.err && (result.err.name === "NotAllowedError" || result.err.name === "PermissionDeniedError")) {
+                            break;
+                        }
+                    }
+                    if (!acquired) {
+                        var failState = "failed";
+                        if (lastErr && (lastErr.name === "NotAllowedError" || lastErr.name === "PermissionDeniedError")) {
+                            failState = "denied";
+                        } else if (lastErr && (lastErr.name === "NotFoundError" || lastErr.name === "DevicesNotFoundError")) {
+                            failState = "absent";
+                        } else if (lastErr && lastErr.name === "OverconstrainedError") {
+                            failState = "overconstrained";
+                        }
+                        cameraState = failState;
+                        setCameraDebug("getUserMedia", lastErr, "all attempts failed");
+                        window.webcamStream = null;
+                        window.requestingForPermissions = false;
+                        return null;
+                    }
+                    window.webcamStream = acquired.stream;
+                    setCameraDebug("stream", "", "acquired via " + acquired.label);
+                    var track = window.webcamStream.getVideoTracks()[0];
+                    if (!track) {
+                        cameraState = "failed";
+                        setCameraDebug("track", { name: "TrackError", message: "no video track" });
+                        stopWebcamTracks();
+                        window.requestingForPermissions = false;
+                        return null;
+                    }
+                    console.log("[Camera] track:", track.label, track.readyState, track.getSettings ? track.getSettings() : null);
+                    if (track.readyState !== "live") {
+                        cameraState = "failed";
+                        setCameraDebug("track", { name: "TrackNotLive", message: "readyState=" + track.readyState }, track.label);
+                        stopWebcamTracks();
+                        window.requestingForPermissions = false;
+                        return null;
+                    }
+                    var video = getWebcamVideo();
+                    video.srcObject = window.webcamStream;
+                    var ready = await waitForVideoReady(video, 10000);
+                    logCameraDiagnostics("RequestWebcam", video);
+                    if (ready.playError) {
+                        setCameraDebug("video.play", ready.playError, "track is live — continue");
+                        console.warn("[Camera] play error but track live, continuing");
+                    }
+                    // 핵심 수정: Android에서 videoWidth=0이어도 live 트랙이면 스트림을 끊지 않는다
+                    if (!ready.videoWidth || !ready.videoHeight) {
+                        console.warn("[Camera] videoWidth/Height=0 after wait — keep live track for Imagine");
+                        setCameraDebug("videoSize", { name: "ZeroVideoSize", message: "videoWidth/Height=0" }, "defer to StartWebcam");
+                    } else {
+                        setCameraDebug("ready", "", ready.videoWidth + "x" + ready.videoHeight + " via " + acquired.label);
+                    }
+                    cameraState = "live";
+                    console.log("Webcam access granted", acquired.label, ready.videoWidth + "x" + ready.videoHeight);
+                    window.requestingForPermissions = false;
+                    return window.webcamStream;
+                } catch (err) {
+                    console.warn("RequestWebcam unexpected error:", err && err.name, err && err.message);
+                    setCameraDebug("RequestWebcam", err);
+                    cameraState = (err && err.name === "NotAllowedError") ? "denied" : "failed";
+                    window.webcamStream = null;
+                    window.requestingForPermissions = false;
+                    return null;
+                }
+            }
+            function StartAR(isPC) {
+                if (unityReady) return unityReady;
+                document.getElementById("startARDiv").style.display = "none";
+                hideCameraFailureUI();
+                resizeUnityCanvas();
+                loadingBar.style.display = "block";
+                manualModeEntered = false;
+                viewMode = isPC ? "manual" : "ar";
+                if (!isPC) {
+                    // 버튼 클릭(사용자 제스처)에서 카메라 + 센서 권한 요청
+                    cameraPermission = RequestWebcam();
+                    requestDeviceOrientation(true).catch(function () {});
+                } else {
+                    cameraPermission = Promise.resolve(null);
+                }
+                unityReady = createUnityInstance(canvas, {
                     dataUrl: "Build/초1_31독립선언서.data.unityweb",
                     frameworkUrl: "Build/초1_31독립선언서.framework.js.unityweb",
                     codeUrl: "Build/초1_31독립선언서.wasm.unityweb",
@@ -129,232 +822,272 @@
                     companyName: "DefaultCompany",
                     productName: "AR_elementary",
                     productVersion: "0.1",
-                    //webglContextAttributes: { "preserveDrawingBuffer": true },
-                    // matchWebGLToCanvasSize: false, // Uncomment this to separately control WebGL canvas render size and DOM element size.
-                    // devicePixelRatio: 1, // Uncomment this to override low DPI rendering on high DPI displays.
                     },
-                    (progress) => {
-                        progressBarFull.style.width = 100 * progress + "%";
+                    function (progress) {
+                        progressBarFull.style.width = (100 * progress) + "%";
                     }
-                ).then((unityInstance) => {
+                ).then(function (unityInstance) {
                     window.unityInstance = unityInstance;
-                    if(!isPC){
-                        RequestWebcam();
-                    }else{
-                        unityInstance.SendMessage('PCMode_Obj', 'DisableARCam');
-                    }
-                    const userAgent = navigator.userAgent.toLowerCase(); //userAgent 문자열 값 받아오기
-                    if (userAgent.indexOf("android") > -1) {    
-                    //안드로이드일 때 실행할 동작
-                    } else if (
-                        userAgent.indexOf("iphone") > -1 ||
-                        userAgent.indexOf("ipad") > -1 || 
-                        userAgent.indexOf("ipod") > -1 
-                    ) {   	
-                    //IOS일 때 실행할 동작
-                        unityInstance.SendMessage('PCMode_Obj', 'IOSSetting');
-                    } else {    
-                    //아이폰, 안드로이드가 아닐 때 실행할 동작
+                    if (isIOSDevice()) {
+                        unityInstance.SendMessage("PCMode_Obj", "IOSSetting");
                     }
                     loadingBar.style.display = "none";
-                });
-                loadingBar.style.display = "block";
-            }
-            //Set Facing Mode here ('environment', 'user', '')
-		window.unityFacingMode = "environment"
-            window.WEBCAM_SETTINGS = {
-                video: {
-                    facingMode: unityFacingMode,
-                },
-                audio: false
-            };
-            window.requestingForPermissions = false;
-            async function RequestWebcam(){
-                window.requestingForPermissions = true;
-                try{
-                    window.webcamStream = await navigator.mediaDevices.getUserMedia(window.WEBCAM_SETTINGS);
-                    console.log("Webcam access granted");
-                    requestingForPermissions = false;
-                }
-                catch (err) {
-                    //user denied camera permission - show error panel
-                    console.error("getUserMedia error - " , err);
-                    ShowError("카메라 권한이 없습니다.");
-                    window.requestingForPermissions = false;
-                }           
-            }
-            async function StartWebcam(){
-                console.log("StartWebcam")
-                while (window.requestingForPermissions) {
-                    // Wait until requestingForPermissions becomes true.
-                    console.log("Waiting for permissions...");
-                    await new Promise(resolve => setTimeout(resolve, 100)); // Adjust the delay time as needed.
-                }
-                console.log("Got Permissions");
-                if(window.webcamStream)
-                {
-                    const video = document.querySelector("#webcam-video");
-                    video.srcObject = webcamStream;
-                    try {
-                        await arCamera.startWebcam(video);
-                        console.log("Webcam started successfully");
-                        window.unityInstance.SendMessage('ARCamera', 'OnStartWebcamSuccess');
-                    }
-                    catch(err){
-                        console.error("Webcam failed to start - ", err);
-                        window.unityInstance.SendMessage('ARCamera', 'OnStartWebcamFail');
-                    }   
-                }
-                else{
-                    console.error("Webcam failed to start - permission not yet granted");
-                    window.unityInstance.SendMessage('ARCamera', 'OnStartWebcamFail');
-                }  
-            }
-            async function LoadWebcams(){
-                let camDevices = [];
-                // let backCams = [];
-                let devices = await navigator.mediaDevices.enumerateDevices();
-                var ctr = 0;
-                devices.forEach(mediaDevice => {
-                    if (mediaDevice.kind === 'videoinput') {
-                        if(window.unityFacingMode == 'environment' && !mediaDevice.label.includes('facing front')){
-                            //back cam only
-                            camDevices.push(mediaDevice);
+                    return cameraPermission.then(function (stream) {
+                        if (isPC || !stream) {
+                            enterManualMode(isPC ? "absent" : cameraState);
+                        } else {
+                            viewMode = "ar";
+                            sendUnity("PCMode_Obj", "SetViewMode", "ar");
+                            sendUnity("PCMode_Obj", "ApplyArCameraClear");
                         }
-                        else if(window.unityFacingMode == 'user' && mediaDevice.label.includes('facing front')){
-                            //front cam only
-                            camDevices.push(mediaDevice);
-                        }
-                        else{
-                            //back and front
-                            camDevices.push(mediaDevice);
-                        }   
-                        
-                        ctr++;
-                    }
-                });
-                var select = document.getElementById("chooseCamSel");
-                select.style.display = "none";
-                var count = 0;
-                //reverse array because some Android phones can't distinguish front and back cams at first load
-                //and when this happens, most of the time, front cam goes first and back cam goes last
-                
-                try {
-                    camDevices = camDevices.reverse();
-                    camDevices.forEach(mediaDevice => {
-                        const option = document.createElement('option');
-                        option.value = mediaDevice.deviceId;
-                        let label = `Camera ${count}`;
-                        if (mediaDevice.label) {
-                            label = mediaDevice.label
-                        }
-                        const textNode = document.createTextNode(label);
-                        option.appendChild(textNode);
-                        select.appendChild(option);
-                        count++;
+                        return unityInstance;
                     });
-                    iTracker.WEBCAM_NAME = select.options[select.selectedIndex].innerHTML;
-                }
-                catch(err){
-                    console.error("Webcam Error");
-                    StartAR(true);
-                }
+                }).catch(function (error) {
+                    console.error("Unity startup failed", error);
+                    loadingBar.style.display = "none";
+                    ShowError("게임을 불러오지 못했습니다. 페이지를 새로고침해 주세요.");
+                    return null;
+                });
+                return unityReady;
             }
-            function SelectCam(){
-                var select = document.getElementById("chooseCamSel");
-                window.deviceId = select.value;
-                window.WEBCAM_SETTINGS.video['deviceId'] = deviceId;
-                //console.log(window.WEBCAM_SETTINGS);
-                iTracker.WEBCAM_NAME = select.options[select.selectedIndex].innerHTML;
+            async function StartWebcam() {
+                if (webcamStarting) return webcamStarting;
+                webcamStarting = (async function () {
+                    console.log("StartWebcam");
+                    setCameraDebug("StartWebcam", "", "begin");
+                    while (window.requestingForPermissions) {
+                        await new Promise(function (r) { setTimeout(r, 100); });
+                    }
+                    var instance = window.unityInstance;
+                    if (!instance && unityReady) {
+                        instance = await unityReady;
+                    }
+                    if (!instance) return;
+                    if (!window.webcamStream) {
+                        console.warn("Webcam not available — PC mode");
+                        setCameraDebug("StartWebcam", { name: "NoStream", message: "webcamStream is null" }, cameraState);
+                        enterManualMode(cameraState || "failed");
+                        instance.SendMessage("ARCamera", "OnStartWebcamFail");
+                        return;
+                    }
+                    var video = getWebcamVideo();
+                    if (video.srcObject !== window.webcamStream) {
+                        video.srcObject = window.webcamStream;
+                    }
+                    try {
+                        var ready = await waitForVideoReady(video, 10000);
+                        logCameraDiagnostics("StartWebcam before arCamera.startWebcam", video);
+                        // track live면 videoWidth=0이어도 Imagine startWebcam을 먼저 시도
+                        var track = window.webcamStream.getVideoTracks()[0];
+                        if ((!ready.videoWidth || !ready.videoHeight) && (!track || track.readyState !== "live")) {
+                            cameraState = "play_failed";
+                            setCameraDebug("videoSize", { name: "ZeroVideoSize", message: "no size and track not live" });
+                            throw new Error("video frames not available (" + ready.videoWidth + "x" + ready.videoHeight + ")");
+                        }
+                        if (ready.playError && (!ready.videoWidth || video.paused)) {
+                            cameraState = "play_failed";
+                            setCameraDebug("video.play", ready.playError);
+                            throw ready.playError;
+                        }
+                        setCameraDebug("arCamera.startWebcam", "", "calling");
+                        await arCamera.startWebcam(video);
+                        logCameraDiagnostics("StartWebcam after arCamera.startWebcam", video);
+                        var sample1 = video.videoWidth + "x" + video.videoHeight + ":" + video.currentTime;
+                        await new Promise(function (r) { setTimeout(r, 250); });
+                        var sample2 = video.videoWidth + "x" + video.videoHeight + ":" + video.currentTime;
+                        console.log("Webcam frame check", sample1, "→", sample2, "paused=", video.paused);
+                        if (!video.videoWidth && (!track || track.readyState !== "live")) {
+                            cameraState = "texture_failed";
+                            setCameraDebug("texture", { name: "NoFrames", message: "no video frames after startWebcam" });
+                            throw new Error("no frames after startWebcam");
+                        }
+                        cameraState = "live";
+                        viewMode = "ar";
+                        manualModeEntered = false;
+                        hideCameraFailureUI();
+                        document.getElementById("startARDiv").style.display = "none";
+                        instance.SendMessage("ARCamera", "OnStartWebcamSuccess");
+                        sendUnity("PCMode_Obj", "SetViewMode", "ar");
+                        sendUnity("PCMode_Obj", "ApplyArCameraClear");
+                        setCameraDebug("success", "", sample2);
+                        console.log("Webcam started successfully");
+                    } catch (err) {
+                        console.warn("Webcam failed to start — PC mode:", err);
+                        logCameraDiagnostics("StartWebcam fail", getWebcamVideo());
+                        var stageState = cameraState;
+                        if (stageState !== "play_failed" && stageState !== "texture_failed" && stageState !== "denied") {
+                            stageState = "texture_failed";
+                        }
+                        setCameraDebug(window.cameraDebug.stage || "arCamera.startWebcam", err);
+                        stopWebcamTracks();
+                        enterManualMode(stageState);
+                        instance.SendMessage("ARCamera", "OnStartWebcamFail");
+                    }
+                })().finally(function () { webcamStarting = null; });
+                return webcamStarting;
             }
-            async function FlipCam(){
-                arCamera.stopWebcam();
-                window.WEBCAM_SETTINGS.video.deviceId = '';
-                if(window.WEBCAM_SETTINGS.video.facingMode == 'user'){
-                    window.WEBCAM_SETTINGS.video.facingMode = 'environment';
+            async function FlipCam() {
+                if (window.arCamera) arCamera.stopWebcam();
+                window.WEBCAM_SETTINGS.video.deviceId = "";
+                if (window.WEBCAM_SETTINGS.video.facingMode === "user") {
+                    window.WEBCAM_SETTINGS.video.facingMode = "environment";
                     arCamera.setFlipped(false);
-                }
-                else{
-                    window.WEBCAM_SETTINGS.video.facingMode = 'user';
+                } else {
+                    window.WEBCAM_SETTINGS.video.facingMode = "user";
                     arCamera.setFlipped(true);
                 }
+                stopWebcamTracks();
                 window.webcamStream = await navigator.mediaDevices.getUserMedia(window.WEBCAM_SETTINGS);
-                const video = document.querySelector("#webcam-video");
-                video.srcObject = webcamStream;
+                var video = document.querySelector("#webcam-video");
+                video.srcObject = window.webcamStream;
                 await arCamera.startWebcam(video);
             }
-            function ShowError(error){
-                document.getElementById("errorDiv").style.display = "flex";
-                document.getElementById("errorText").innerHTML = error;
+            async function RetryCamera() {
+                hideCameraFailureUI();
+                document.getElementById("startARDiv").style.display = "none";
+                manualModeEntered = false;
+                var stream = await RequestWebcam();
+                if (!stream) {
+                    enterManualMode(cameraState || "failed", { showFailureUi: true });
+                    return;
+                }
+                if (window.unityInstance) {
+                    // PC 모드에서 빠져 AR로 재시도
+                    sendUnity("PCMode_Obj", "SetViewMode", "ar");
+                    await StartWebcam();
+                } else {
+                    // unityReady 리셋이 필요하면 StartAR 경로
+                    if (!unityReady) {
+                        StartAR(false);
+                    } else {
+                        await StartWebcam();
+                    }
+                }
             }
-            function ShowScreenshot(dataUrl){
+            function ContinuePcMode() {
+                hideCameraFailureUI();
+                document.getElementById("startARDiv").style.display = "none";
+                enterManualMode(cameraState || "failed", { showFailureUi: false });
+                console.log("[Camera] user chose continue PC mode", window.cameraDebug);
+            }
+            function ShowError(error) {
+                // Unity 로드 실패 등 치명적 오류에만 사용. 카메라 거부는 사용하지 않음.
+                document.getElementById("errorDiv").style.display = "flex";
+                document.getElementById("errorText").textContent = error;
+            }
+            function ShowScreenshot(dataUrl) {
                 document.getElementById("screenshotDiv").style.display = "flex";
                 document.getElementById("screenshotImg").src = dataUrl;
                 document.getElementById("screenshotImg").style.width = "80vw";
-                document.getElementById("screenshotImg").style.height = 80 / window.innerWidth * window.innerHeight + "vw";
+                document.getElementById("screenshotImg").style.height = (80 / window.innerWidth * window.innerHeight) + "vw";
             }
-            function ShowConfirmUrl(url){
+            function ShowConfirmUrl(url) {
                 document.getElementById("confirmUrlDiv").style.display = "flex";
                 window.newUrlString = url;
-                document.getElementById("confirmUrlText").innerText = "Are you sure you want to visit " + url;                
+                document.getElementById("confirmUrlText").innerText = "Are you sure you want to visit " + url;
             }
-            window.ITRACKER_GLOBALS = {
-                //place global settings here
-                INTERNAL_SMOOTHFACTOR_POS: .075,
-            }   
-            function OpenFullscreen(type) {
-                
-                const userAgent = navigator.userAgent.toLowerCase(); //userAgent 문자열 값 받아오기
-                if (userAgent.indexOf("android") > -1) {    
-                //안드로이드일 때 실행할 동작
-                } else if (
-                    userAgent.indexOf("iphone") > -1 ||
-                    userAgent.indexOf("ipad") > -1 || 
-                    userAgent.indexOf("ipod") > -1 
-                ) {   	
-                //IOS일 때 실행할 동작
-                    return;
-                } else {    
-                //아이폰, 안드로이드가 아닐 때 실행할 동작
+            async function suspendPage() {
+                pageSuspended = true;
+                try {
+                    if (window.arCamera && typeof arCamera.pauseCamera === "function") {
+                        arCamera.pauseCamera();
+                    }
+                    var video = document.getElementById("webcam-video");
+                    if (video && !video.paused) video.pause();
+                } catch (e) {
+                    console.warn("suspendPage:", e);
                 }
-                const elem = canvas;
-                if (elem.requestFullscreen) {
-                console.log("A");
-                elem.requestFullscreen();
-                } else if (elem.mozRequestFullScreen) {
-                /* Firefox */
-                console.log("B");
-                elem.documentElementmozRequestFullScreen();
-                } else if (elem.webkitRequestFullscreen) {
-                /* Chrome, Safari and Opera */
-                console.log("C");
-                elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                /* IE/Edge */
-                console.log("D");
-                this.elem.msRequestFullscreen();
-                }
-                screen.orientation.lock(type);
             }
-            function detectBrowswerName() {
-                let userAgent = navigator.userAgent;
-                let browserName;
-                if (userAgent.match(/chrome|chromium|crios/i)) {
-                browserName = 'chrome';
-                } else if (userAgent.match(/firefox|fxios/i)) {
-                browserName = 'firefox';
-                } else if (userAgent.match(/safari/i)) {
-                browserName = 'safari';
-                } else if (userAgent.match(/opr\//i)) {
-                browserName = 'opera';
-                } else if (userAgent.match(/edg/i)) {
-                browserName = 'edge';
+            async function resumePage() {
+                pageSuspended = false;
+                try {
+                    var video = document.getElementById("webcam-video");
+                    if (video && video.srcObject && video.paused) {
+                        await video.play().catch(function (err) {
+                            console.warn("Camera resume failed:", err);
+                        });
+                    }
+                    if (window.arCamera && typeof arCamera.unpauseCamera === "function") {
+                        arCamera.unpauseCamera();
+                    }
+                    // 스트림이 죽은 경우 재연결 시도
+                    if (viewMode === "ar" && window.webcamStream) {
+                        var alive = window.webcamStream.getTracks().some(function (t) {
+                            return t.readyState === "live";
+                        });
+                        if (!alive) {
+                            var stream = await RequestWebcam();
+                            if (!stream) {
+                                enterManualMode("failed");
+                            } else {
+                                await StartWebcam();
+                            }
+                        }
+                    }
+                    if (window.unityInstance) {
+                        sendUnity("PCMode_Obj", "WaitTouch");
+                    }
+                } catch (e) {
+                    console.warn("resumePage:", e);
+                }
+            }
+            function cleanupOnExit() {
+                stopDeviceOrientation();
+                stopWebcamTracks();
+            }
+            retryCamButton.addEventListener("click", function () {
+                RetryCamera().catch(function (err) {
+                    console.warn("RetryCamera failed:", err);
+                    setCameraDebug("RetryCamera", err);
+                    showCameraFailureUI(cameraState || "failed");
+                });
+            });
+            if (continuePcButton) {
+                continuePcButton.addEventListener("click", function () {
+                    ContinuePcMode();
+                });
+            }
+            document.addEventListener("visibilitychange", function () {
+                if (document.visibilityState === "hidden") {
+                    suspendPage();
                 } else {
-                browserName = 'No browser detection';
+                    resumePage();
                 }
-                alert(`${browserName}`)
-                return browserName
+            });
+            window.addEventListener("pagehide", cleanupOnExit);
+            window.addEventListener("beforeunload", cleanupOnExit);
+            document.addEventListener("fullscreenchange", function () {
+                if (!fullscreenElement() && isStart) {
+                    userExitedFullscreen = true;
+                }
+                resizeUnityCanvas();
+                updateRotateHint();
+            });
+            document.addEventListener("webkitfullscreenchange", function () {
+                if (!fullscreenElement() && isStart) {
+                    userExitedFullscreen = true;
+                }
+                resizeUnityCanvas();
+                updateRotateHint();
+            });
+            window.addEventListener("resize", function () {
+                resizeUnityCanvas();
+                updateRotateHint();
+            });
+            window.addEventListener("orientationchange", function () {
+                setTimeout(function () {
+                    resizeUnityCanvas();
+                    updateRotateHint();
+                }, 100);
+            });
+            if (screen.orientation && typeof screen.orientation.addEventListener === "function") {
+                screen.orientation.addEventListener("change", function () {
+                    resizeUnityCanvas();
+                    updateRotateHint();
+                });
             }
+            resizeUnityCanvas();
+            initialize();
     </script>
 </body>
 </html>
