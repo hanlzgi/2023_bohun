@@ -426,7 +426,7 @@ var eBookData = {
 ],
 [33,{type:"image", id:"Image_355", name:"33_pic2", visible:"false", x:"15", y:"450", width:"1369", height:"867", opacity:"100", normalImage:"1700051269588.png", rolloverImage:"", link:""},
 {type:"image", id:"Image_356", name:"33_pic1", visible:"false", x:"15", y:"450", width:"1367", height:"873", opacity:"100", normalImage:"1700051232389.png", rolloverImage:"", link:""},
-{type:"image", id:"Image_357", name:"33_lk_bn", visible:"true", x:"150", y:"1274", width:"411", height:"52", opacity:"100", normalImage:"1699718678394.png", rolloverImage:"1699718707561.png", link:"address|_blank|https://www.dnc.go.kr/html/kr/part/part_0206.html"},
+{type:"image", id:"Image_357", name:"33_lk_bn", visible:"true", x:"150", y:"1274", width:"411", height:"52", opacity:"100", normalImage:"1699718678394.png", rolloverImage:"1699718707561.png", link:"address|_blank|https://www.dnc.go.kr/"},
 {type:"link", id:"Link_570", name:"mpva_logo", visible:"true", x:"68", y:"34", width:"182", height:"44", backgroundColor:"0x5cd6d5,0", rolloverColor:"0xffffff,10", borderColor:"0x000000,0", borderWidth:"0", link:"address|_blank|https://www.mpva.go.kr/"},
 {type:"link", id:"Link_571", name:"33_pic1_bu", visible:"true", x:"963", y:"497", width:"310", height:"225", backgroundColor:"0x5cd6d5,0", rolloverColor:"0x000000,10", borderColor:"0x000000,0", borderWidth:"0", link:""},
 {type:"popModal", id:"popModal_Action_Link_571", name:"액션Link_571", dispatcher:"Link_571", event:"onRelease", target:"Image_356", action:"toggleVisible"},
