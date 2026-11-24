@@ -2,6 +2,63 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <script>
+      // [261124] 다른 탭으로 바꾸거나 창을 최소화하면 사운드 정지, 돌아오면 재개 (Unity 로더보다 먼저 실행되어야 함)
+      (function () {
+        const contexts = [];
+        const media = [];
+        const pausedByTab = new Set();
+        const mutedByTab = new Set();
+        const wrapped = new Map();
+
+        ["AudioContext", "webkitAudioContext"].forEach(function (name) {
+          const Original = window[name];
+          if (typeof Original !== "function") return;
+          if (wrapped.has(Original)) { window[name] = wrapped.get(Original); return; }
+          const Tracked = function () {
+            const ctx = new (Function.prototype.bind.apply(Original, [null].concat(Array.prototype.slice.call(arguments))))();
+            contexts.push(ctx);
+            if (document.hidden && ctx.state === "running") { ctx.suspend(); pausedByTab.add(ctx); }
+            return ctx;
+          };
+          Tracked.prototype = Original.prototype;
+          Object.setPrototypeOf(Tracked, Original);
+          wrapped.set(Original, Tracked);
+          window[name] = Tracked;
+        });
+
+        const createElement = document.createElement.bind(document);
+        document.createElement = function (tag, options) {
+          const el = createElement(tag, options);
+          if (/^(audio|video)$/i.test(String(tag))) media.push(el);
+          return el;
+        };
+
+        function applyVisibility() {
+          const hidden = document.hidden;
+          contexts.forEach(function (ctx) {
+            if (hidden) {
+              if (ctx.state === "running") { ctx.suspend(); pausedByTab.add(ctx); }
+            } else if (pausedByTab.has(ctx)) {
+              pausedByTab.delete(ctx);
+              Promise.resolve(ctx.resume()).catch(function () {});
+            }
+          });
+          document.querySelectorAll("audio, video").forEach(function (el) { if (media.indexOf(el) < 0) media.push(el); });
+          media.forEach(function (el) {
+            if (hidden) {
+              if (!el.muted) { el.muted = true; mutedByTab.add(el); }
+            } else if (mutedByTab.has(el)) {
+              mutedByTab.delete(el);
+              el.muted = false;
+            }
+          });
+        }
+        document.addEventListener("visibilitychange", applyVisibility);
+        window.addEventListener("pagehide", applyVisibility);
+        window.addEventListener("pageshow", applyVisibility);
+      })();
+    </script>
     <meta name="viewport" content='width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=yes'>
     <title>Unity WebGL Player | bohoon_webAR</title>
     <link rel="stylesheet" href="TemplateData/style.css">
