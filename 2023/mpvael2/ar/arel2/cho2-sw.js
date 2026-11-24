@@ -1,4 +1,4 @@
-const revision = "cho2-mode1";
+const revision = "cho2-start2";
 
 self.addEventListener("install", event => {
     event.waitUntil(Promise.resolve(revision).then(() => self.skipWaiting()));

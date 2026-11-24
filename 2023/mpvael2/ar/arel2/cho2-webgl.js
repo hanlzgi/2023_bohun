@@ -94,6 +94,27 @@
         notices.className = "cho2-notices";
         notices.hidden = true;
         document.body.append(notices);
+        video.setAttribute("playsinline", "");
+        video.setAttribute("webkit-playsinline", "");
+        video.style.cssText = "position:fixed;width:1px;height:1px;opacity:0;pointer-events:none";
+        video.setAttribute("aria-hidden", "true");
+        document.body.append(video);
+        const manualButton = document.createElement("button");
+        manualButton.id = "cho2-manual-start";
+        manualButton.type = "button";
+        manualButton.textContent = "카메라 없이 둘러보기";
+        manualButton.hidden = true;
+        manualButton.onclick = () => {
+            if (starting || instance || cameraRequest) return;
+            gateUsed = true;
+            wantCamera = false;
+            stopCamera();
+            useManualView();
+            hideIntro();
+            start();
+        };
+        document.getElementById("startARDiv").append(manualButton);
+        showIntro();
         maybeShowInitialRotateHint();
         installApp();
 
@@ -229,6 +250,8 @@
 
     function onUserGesture(event) {
         if (!acceptsFullscreenGesture(event)) return;
+        // Permission requests must retain the activation from the start button.
+        if (!instance || event.target.closest?.("#startARDiv")) return;
         if (viewMode === "ar" && isMobileBrowser()) requestSensor(true);
         if (userExitedFullscreen) return;
         if (isAppFullscreen()) {
@@ -297,9 +320,9 @@
         if ("serviceWorker" in navigator) {
             let reloading = false;
             navigator.serviceWorker.addEventListener("controllerchange", () => {
-                if (reloading || sessionStorage.getItem("cho2-sw-mode1")) return;
+                if (reloading || sessionStorage.getItem("cho2-sw-start2")) return;
                 reloading = true;
-                sessionStorage.setItem("cho2-sw-mode1", "1");
+                sessionStorage.setItem("cho2-sw-start2", "1");
                 location.reload();
             });
             navigator.serviceWorker.register("cho2-sw.js", {scope: "./"}).then(registration => {
@@ -334,6 +357,7 @@
         const button = document.getElementById("startARButton");
         if (!intro || !button) return;
         button.onclick = onDeviceButton;
+        intro.style.display = "";
         intro.classList.add("cho2-show");
     }
 
@@ -356,20 +380,46 @@
         publishViewMode();
     }
 
-    function onDeviceButton(event) {
+    async function onDeviceButton(event) {
         if (event) event.preventDefault();
-        if (gateUsed) return;
+        if (gateUsed || starting || instance) return;
         gateUsed = true;
-        hideIntro();
+        const button = document.getElementById("startARButton");
+        button.disabled = true;
+        button.textContent = "카메라 권한 확인 중…";
         wantCamera = true;
         viewMode = "ar";
-        publishViewMode();
+        // Both permission APIs are invoked in this click, before awaiting either.
         requestSensor(true);
-        startCamera();
+        try {
+            await startCamera();
+            if (!stream) {
+                gateUsed = false;
+                document.querySelector("#startARDiv p").textContent =
+                    "카메라를 연결하지 못했습니다. 브라우저의 카메라 권한과 HTTPS 연결을 확인하고 다시 시도해 주세요.";
+                document.getElementById("cho2-manual-start").hidden = false;
+                button.textContent = "카메라 재시도";
+                button.disabled = false;
+                showIntro();
+                return;
+            }
+            hideIntro();
+            await start();
+        } catch (error) {
+            gateUsed = false;
+            button.disabled = false;
+            button.textContent = "카메라 재시도";
+            showIntro();
+            console.warn("cho2 camera permission failed", error && error.name);
+        }
     }
 
     async function start() {
         if (starting || instance) return;
+        if (!gateUsed) {
+            showIntro();
+            return;
+        }
         starting = true;
         const intro = document.getElementById("startARDiv");
         const button = document.getElementById("startARButton");
@@ -381,16 +431,6 @@
         view.loadingCover.style.display = "";
         view.progressBarEmpty.style.display = "none";
         view.spinner.style.display = "";
-        let availability = "uncertain";
-        try {
-            availability = await inspectCameras();
-        } catch (error) {
-            console.warn("cho2 camera inspect failed", error && error.name, error && error.message);
-            availability = "uncertain";
-        }
-        const needsGate = availability === "available" || availability === "uncertain";
-        if (needsGate) showIntro();
-        else hideIntro();
         try {
             await loader();
             instance = await window.createUnityInstance(view.canvas, view.config, progress => {
@@ -405,8 +445,7 @@
             notices.hidden = false;
             send("HandleCho2CameraMode", cameraState);
             publishViewMode();
-            if (!needsGate && availability === "denied")
-                notice("camera", "카메라 권한이 없어 화면을 끌어 둘러봅니다.");
+
             requestLocation();
         } catch (error) {
             console.error("Unity startup failed", error);
@@ -449,7 +488,7 @@
         wantCamera = false;
         stopCamera();
         setCameraState(state);
-        hideIntro();
+        if (instance) hideIntro();
         useManualView();
         if (state === "denied")
             notice("camera", "카메라 권한이 없어 화면을 끌어 둘러봅니다.");
@@ -458,7 +497,7 @@
     }
 
     function onDeviceChange() {
-        if (viewMode === "ar" || gateUsed || cameraRequest || stream) return;
+        if (!instance || viewMode === "ar" || gateUsed || cameraRequest || stream) return;
         inspectCameras().then(kind => {
             if ((kind === "available" || kind === "uncertain") && viewMode === "manual" && !gateUsed)
                 showIntro();
@@ -519,14 +558,16 @@
     }
 
     function startCamera() {
-        if (!wantCamera || cameraState === "absent" || cameraRequest || stream || document.hidden) return;
+        if (cameraRequest) return cameraRequest;
+        if (!wantCamera || stream) return Promise.resolve();
         if (!navigator.mediaDevices?.getUserMedia) {
-            setCameraState("uncertain");
-            return;
+            failCamera("failed");
+            return Promise.resolve();
         }
         console.info("cho2 getUserMedia");
         setCameraState("prompting");
         cameraRequest = openCamera(cameraRevision);
+        return cameraRequest;
     }
 
     async function openCamera(revision) {
@@ -535,7 +576,7 @@
                 audio: false,
                 video: {facingMode: {ideal: "environment"}, width: {ideal: 960}, height: {ideal: 540}, frameRate: {ideal: 24, max: 30}}
             });
-            if (!wantCamera || document.hidden || revision !== cameraRevision) {
+            if (!wantCamera || revision !== cameraRevision) {
                 incoming.getTracks().forEach(track => track.stop());
                 return;
             }
@@ -554,7 +595,7 @@
             await video.play();
             if (stream === incoming) setCameraState("live");
         } catch (error) {
-            if (revision !== cameraRevision || document.hidden || !wantCamera) return;
+            if (revision !== cameraRevision || !wantCamera) return;
             const name = error && error.name;
             console.warn("cho2 camera failed", name, error && error.message);
             if (name === "NotFoundError" || name === "DevicesNotFoundError")
