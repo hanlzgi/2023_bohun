@@ -20,6 +20,77 @@
     let orientationLocked = false, lockPending = false;
     let fullscreenAttempts = 0, lastFullscreenError = "", orientationLockResult = "not-requested";
     let cameraFrames = 0;
+    const cameraTextureEdge = 640;
+    let graphicsState = "ready", graphicsContext, displayFrame;
+    let graphicsLosses = 0, graphicsRestores = 0, unityStarts = 0, displayUpdates = 0;
+    const graphicsErrors = [];
+    const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
+    const isIPad = /iPad/i.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isIOS = isIPhone || isIPad;
+    const debugOrientation = document.currentScript?.hasAttribute("data-cho2-orientation-debug");
+    let iosPose, sentIOSPose, iosAngle, iosTransition, iosFrame, iosWatchUntil = 0;
+    let iosUsesStandard = false, iosLegacyHasTurned = false, iosStandardCandidate, iosStandardSince;
+    let iosSensorSource, iosBasis, iosCompassOffset;
+    let screenTurns = 0;
+    let lastOrientationEvent, lastOrientationLogAt = -Infinity;
+    const projections = new Map();
+    let projectionPanel, projectionText;
+
+    function projectionReport() {
+        return JSON.stringify({
+            time: new Date().toISOString(), screenOrientation: screen.orientation?.angle,
+            legacyOrientation: window.orientation, appliedScreenAngle: lastSensor?.[3],
+            rawSensor: lastOrientationEvent, tracking: sensorListening && viewMode === "ar",
+            lastPoseAt: iosPose?.at, holdingPose: !!iosTransition, graphicsState,
+            video: {size: [video.videoWidth, video.videoHeight], uploadFlipY: true,
+                appliedRotationDeg: 0, orientation: "browser-decoded; rotation metadata is not exposed"},
+            landmarks: Object.fromEntries(projections)
+        }, null, 2);
+    }
+
+    function recordProjection(line) {
+        if (!debugOrientation) return;
+        const name = line.slice(5, line.indexOf(";"));
+        projections.set(name, line);
+        if (projectionPanel && !projectionPanel.hidden && document.activeElement !== projectionText)
+            projectionText.value = projectionReport();
+    }
+
+    function installProjectionPanel() {
+        if (!debugOrientation) return;
+        const open = document.createElement("button");
+        open.textContent = "회전 진단";
+        open.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:10001";
+        projectionPanel = document.createElement("section");
+        projectionPanel.hidden = true;
+        projectionPanel.style.cssText = "position:fixed;inset:auto 12px 48px;max-width:620px;z-index:10001;background:white;color:#15212c;padding:10px";
+        projectionText = document.createElement("textarea");
+        projectionText.readOnly = true;
+        projectionText.rows = 11;
+        projectionText.style.cssText = "display:block;width:100%;box-sizing:border-box;font-size:16px";
+        projectionText.setAttribute("aria-label", "회전 진단 기록");
+        const copy = document.createElement("button");
+        copy.textContent = "스냅샷 복사";
+        copy.onclick = async () => {
+            const report = projectionReport();
+            projectionText.value = report;
+            try {
+                await navigator.clipboard.writeText(report);
+                copy.textContent = "복사 완료";
+            } catch {
+                projectionText.focus();
+                projectionText.select();
+                copy.textContent = "선택한 기록을 복사하세요";
+            }
+        };
+        open.onclick = () => {
+            projectionPanel.hidden = !projectionPanel.hidden;
+            if (!projectionPanel.hidden) projectionText.value = projectionReport();
+        };
+        projectionPanel.append(copy, projectionText);
+        document.body.append(open, projectionPanel);
+    }
 
     const video = document.createElement("video");
     video.muted = true;
@@ -53,7 +124,7 @@
     }
 
     function send(method, data) {
-        if (!instance) return false;
+        if (!instance || graphicsState !== "ready") return false;
         try {
             if (data === undefined) instance.SendMessage("LocationManager", method);
             else instance.SendMessage("LocationManager", method, data);
@@ -66,23 +137,99 @@
 
     function updatePixelRatio() {
         if (!view) return;
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
+        const viewportPixels = Math.max(1, window.innerWidth * window.innerHeight);
+        const screenPixels = (screen.width || 0) * (screen.height || 0);
+        const ratio = isIOS
+            ? Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(2000000 / Math.max(viewportPixels, screenPixels)))
+            : Math.min(window.devicePixelRatio || 1, 2);
         view.config.devicePixelRatio = ratio;
         if (instance) instance.Module.devicePixelRatio = ratio;
     }
 
+    function rememberGraphicsError(source, error) {
+        if (graphicsErrors.length === 12) graphicsErrors.shift();
+        graphicsErrors.push({at: performance.now(), source, message: String(error).slice(0, 1200)});
+    }
+
+    function graphicsSnapshot() {
+        const canvas = view.canvas;
+        return {at: performance.now(), state: graphicsState, unityStarts, displayUpdates,
+            canvases: document.querySelectorAll("#unity-canvas").length, graphicsLosses, graphicsRestores,
+            contextLost: graphicsContext?.isContextLost(), backing: [canvas.width, canvas.height],
+            drawingBuffer: graphicsContext && [graphicsContext.drawingBufferWidth, graphicsContext.drawingBufferHeight],
+            wasmHeapBytes: instance?.Module.HEAPU8?.byteLength,
+            viewport: [window.innerWidth, window.innerHeight], pixelRatio: view.config.devicePixelRatio,
+            video: [video.videoWidth, video.videoHeight], upload: [frame.width, frame.height],
+            cameraFrames, recentErrors: graphicsErrors.slice()};
+    }
+
+    function loseGraphics(source) {
+        if (graphicsState !== "ready") return;
+        graphicsState = "lost";
+        graphicsLosses += 1;
+        console.error("cho2 WebGL context lost", source, graphicsSnapshot());
+        instance?.Module.pauseMainLoop?.();
+        wantCamera = false;
+        cameraRevision += 1;
+        stopCamera();
+        view.loadingCover.style.display = "none";
+        notices.hidden = false;
+        notice("graphics", "그래픽 연결이 끊겼습니다. 체험을 다시 시작해 주세요.",
+            "다시 시작", () => location.reload());
+    }
+
+    function monitorGraphics() {
+        view.canvas.addEventListener("webglcontextlost", event => {
+            event.preventDefault();
+            loseGraphics("webglcontextlost");
+            console.warn("cho2 webglcontextlost", event.statusMessage, graphicsSnapshot());
+        });
+        view.canvas.addEventListener("webglcontextrestored", event => {
+            graphicsState = "restored";
+            graphicsRestores += 1;
+            console.info("cho2 webglcontextrestored", event.statusMessage, graphicsSnapshot());
+            // Old Unity textures and buffers are invalid even after the browser restores GL.
+            notice("graphics", "그래픽 연결이 복구됐습니다. 체험을 다시 시작해 주세요.",
+                "다시 시작", () => location.reload());
+        });
+        view.canvas.addEventListener("webglcontextcreationerror", event =>
+            rememberGraphicsError("webglcontextcreationerror", event.statusMessage));
+        window.addEventListener("error", event => rememberGraphicsError("javascript", event.error?.stack || event.message));
+        window.addEventListener("unhandledrejection", event =>
+            rememberGraphicsError("unhandledrejection", event.reason?.stack || event.reason));
+        const printErr = view.config.printErr || console.error.bind(console);
+        view.config.printErr = (...args) => {
+            rememberGraphicsError("unity", args.join(" "));
+            printErr(...args);
+        };
+        const previousFrame = view.config.preMainLoop;
+        view.config.preMainLoop = function () {
+            graphicsContext = this.ctx || graphicsContext;
+            // The context can be marked lost before the DOM event is dispatched.
+            if (graphicsContext?.isContextLost()) loseGraphics("preMainLoop");
+            return graphicsState === "ready" && previousFrame?.call(this) !== false;
+        };
+    }
+
     function mount(options) {
+        if (view) return;
         view = options;
         document.documentElement.classList.add("cho2-webgl");
         document.querySelector('meta[name="viewport"]').content =
             "width=device-width, initial-scale=1, viewport-fit=cover";
         updatePixelRatio();
-        window.addEventListener("resize", updatePixelRatio);
+        view.canvas.style.width = "100%";
+        view.canvas.style.height = "100%";
+        window.addEventListener("resize", fitCanvas);
+        if (isIOS) window.addEventListener("resize", watchIOSOrientation);
         window.addEventListener("orientationchange", onDisplayChange);
         if (screen.orientation)
             screen.orientation.addEventListener("change", onDisplayChange);
         if (window.visualViewport)
-            window.visualViewport.addEventListener("resize", fitCanvas);
+            window.visualViewport.addEventListener("resize", () => {
+                watchIOSOrientation();
+                fitCanvas();
+            });
         window.addEventListener("pointerdown", onUserGesture, true);
         window.addEventListener("mousedown", onUserGesture, true);
         window.addEventListener("pointerup", onUserGesture, true);
@@ -94,6 +241,8 @@
         notices.className = "cho2-notices";
         notices.hidden = true;
         document.body.append(notices);
+        monitorGraphics();
+        installProjectionPanel();
         video.setAttribute("playsinline", "");
         video.setAttribute("webkit-playsinline", "");
         video.style.cssText = "position:fixed;width:1px;height:1px;opacity:0;pointer-events:none";
@@ -114,7 +263,16 @@
             start();
         };
         document.getElementById("startARDiv").append(manualButton);
-        showIntro();
+        inspectCameras().then(availability => {
+            if (starting || instance || gateUsed) return;
+            if (availability === "absent" || availability === "denied") {
+                gateUsed = true;
+                hideIntro();
+                start();
+            } else {
+                showIntro();
+            }
+        });
         maybeShowInitialRotateHint();
         installApp();
 
@@ -145,7 +303,7 @@
     }
 
     function isMobileBrowser() {
-        return window.matchMedia("(pointer: coarse)").matches ||
+        return isIPad || window.matchMedia("(pointer: coarse)").matches ||
             /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
@@ -156,22 +314,19 @@
         return window.innerHeight > window.innerWidth;
     }
 
-    let fittingCanvas = false;
     function fitCanvas() {
-        if (!view || fittingCanvas) return;
-        fittingCanvas = true;
-        try {
-            view.canvas.style.width = "100%";
-            view.canvas.style.height = "100%";
+        if (!view || displayFrame !== undefined || graphicsState !== "ready") return;
+        displayFrame = requestAnimationFrame(() => {
+            displayFrame = undefined;
+            if (graphicsState !== "ready") return;
+            displayUpdates += 1;
             updatePixelRatio();
-            window.dispatchEvent(new Event("resize"));
             publishSafeArea();
-        } finally {
-            fittingCanvas = false;
-        }
+        });
     }
 
     function onDisplayChange() {
+        watchIOSOrientation();
         fitCanvas();
         if (orientationLocked) notice("rotate", "");
         else if (sawFullscreen) updateRotateHint();
@@ -287,6 +442,7 @@
     }
 
     function onFullscreenChange() {
+        watchIOSOrientation();
         const active = !!fullscreenElement();
         console.info("cho2 fullscreenchange", {active, mode: displayMode()});
         if (active) {
@@ -318,14 +474,10 @@
         const mode = displayMode();
         console.info("cho2 display mode", mode);
         if ("serviceWorker" in navigator) {
-            let reloading = false;
             navigator.serviceWorker.addEventListener("controllerchange", () => {
-                if (reloading || sessionStorage.getItem("cho2-sw-start2")) return;
-                reloading = true;
-                sessionStorage.setItem("cho2-sw-start2", "1");
-                location.reload();
+                console.info("cho2 service worker changed");
             });
-            navigator.serviceWorker.register("cho2-sw.js", {scope: "./"}).then(registration => {
+            navigator.serviceWorker.register("cho2-sw.js", {scope: "./", updateViaCache: "none"}).then(registration => {
                 console.info("cho2 service worker", registration.scope);
             }).catch(error => {
                 console.warn("cho2 service worker rejected", error && error.name, error && error.message);
@@ -377,6 +529,7 @@
         window.removeEventListener("deviceorientation", onOrientation);
         sensorListening = false;
         lastSensor = undefined;
+        iosPose = sentIOSPose = iosSensorSource = iosBasis = iosCompassOffset = iosTransition = undefined;
         publishViewMode();
     }
 
@@ -394,6 +547,11 @@
         try {
             await startCamera();
             if (!stream) {
+                if (cameraState === "denied" || cameraState === "absent") {
+                    hideIntro();
+                    await start();
+                    return;
+                }
                 gateUsed = false;
                 document.querySelector("#startARDiv p").textContent =
                     "카메라를 연결하지 못했습니다. 브라우저의 카메라 권한과 HTTPS 연결을 확인하고 다시 시도해 주세요.";
@@ -415,7 +573,7 @@
     }
 
     async function start() {
-        if (starting || instance) return;
+        if (starting || instance || graphicsState !== "ready") return;
         if (!gateUsed) {
             showIntro();
             return;
@@ -433,6 +591,7 @@
         view.spinner.style.display = "";
         try {
             await loader();
+            unityStarts += 1;
             instance = await window.createUnityInstance(view.canvas, view.config, progress => {
                 const percentage = Math.round(100 * progress);
                 loadStatus.textContent = "콘텐츠를 불러오는 중… " + percentage + "%";
@@ -440,18 +599,24 @@
                 view.progressBarEmpty.style.display = "";
                 view.progressBarFull.style.width = percentage + "%";
             });
-            window.dispatchEvent(new Event("resize"));
+            if (graphicsState !== "ready") {
+                instance.Module.pauseMainLoop();
+                return;
+            }
+            fitCanvas();
             publishSafeArea();
             notices.hidden = false;
             send("HandleCho2CameraMode", cameraState);
             publishViewMode();
+            if (isIOS) queueIOSOrientation();
 
             requestLocation();
         } catch (error) {
+            rememberGraphicsError("startup", error?.stack || error);
             console.error("Unity startup failed", error);
             wantCamera = false;
             stopCamera();
-            if (intro && introText && button) {
+            if (graphicsState === "ready" && intro && introText && button) {
                 intro.classList.add("cho2-show");
                 introText.textContent = "콘텐츠를 불러오지 못했습니다. 연결을 확인하고 다시 시도해 주세요.";
                 button.textContent = "다시 시도";
@@ -612,12 +777,18 @@
     }
 
     function cameraSize() {
+        if (!wantCamera || graphicsState !== "ready") return -1;
         if (!stream || video.readyState < 2 || document.hidden) return 0;
         return (video.videoWidth << 16) | video.videoHeight;
     }
 
     function uploadCamera(gl, texture) {
-        if (!texture || !cameraSize()) return;
+        graphicsContext = gl;
+        if (gl.isContextLost()) {
+            loseGraphics("camera upload");
+            return;
+        }
+        if (!texture || cameraSize() <= 0) return;
         if (lastTexture === texture && lastTime === video.currentTime) {
             if (cameraDeadline && performance.now() > cameraDeadline)
                 failCamera("failed");
@@ -629,9 +800,8 @@
         try {
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-            if (frame.width !== video.videoWidth || frame.height !== video.videoHeight) {
-                frame.width = video.videoWidth;
-                frame.height = video.videoHeight;
+            if (frame.width !== cameraTextureEdge || frame.height !== cameraTextureEdge) {
+                frame.width = frame.height = cameraTextureEdge;
             }
             frameContext.drawImage(video, 0, 0, frame.width, frame.height);
             gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, frame);
@@ -640,8 +810,10 @@
             cameraFrames += 1;
             lastTime = video.currentTime;
             lastTexture = texture;
-        } catch {
-            failCamera("failed");
+        } catch (error) {
+            rememberGraphicsError("camera upload", error?.stack || error);
+            if (gl.isContextLost()) loseGraphics("camera upload exception");
+            else failCamera("failed");
         } finally {
             gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
             gl.bindTexture(gl.TEXTURE_2D, binding);
@@ -649,6 +821,10 @@
     }
 
     function suspend() {
+        if (isIOS) {
+            iosPose = sentIOSPose = lastSensor = iosTransition = undefined;
+            iosWatchUntil = 0;
+        }
         // A permission sheet can hide the page while getUserMedia is still pending.
         // Cancelling that request drops the grant and never shows the camera.
         if (!(cameraRequest && !stream)) {
@@ -659,9 +835,10 @@
     }
 
     function resume() {
-        if (document.hidden) return;
+        if (document.hidden || graphicsState !== "ready") return;
         if (wantCamera && !stream && !cameraRequest) startCamera();
         if (instance && sensorListening && !lastSensor) scheduleSensorCheck();
+        watchIOSOrientation();
     }
 
     function locationFailure(error) {
@@ -792,8 +969,148 @@
         return {heading, magnitude: Math.hypot(east, north)};
     }
 
+    function readScreenAngle() {
+        const angle = screen.orientation?.angle ?? window.orientation;
+        return Number.isFinite(angle) ? ((angle % 360) + 360) % 360 : 0;
+    }
+
+    function rightAngle(value) {
+        return Number.isFinite(value) && value % 90 === 0 ? ((value % 360) + 360) % 360 : undefined;
+    }
+
+    function readIOSAngle(now) {
+        const legacy = rightAngle(window.orientation);
+        const modern = rightAngle(screen.orientation?.angle);
+        const type = screen.orientation?.type;
+        const modernMatchesType = modern !== undefined &&
+            (type?.startsWith("landscape") && modern % 180 === 90 ||
+             type?.startsWith("portrait") && modern % 180 === 0);
+        // Some WKWebViews start with a placeholder legacy 0 in landscape.
+        // Once the legacy value moves, keep it authoritative across delayed standard events.
+        if (legacy !== undefined && legacy !== 0) {
+            iosLegacyHasTurned = true;
+            iosUsesStandard = false;
+        }
+        const fallback = !iosLegacyHasTurned && !iosUsesStandard && legacy === 0 &&
+            modernMatchesType && modern % 180 === 90 ? modern : undefined;
+        if (fallback !== iosStandardCandidate) {
+            iosStandardCandidate = fallback;
+            iosStandardSince = now;
+        }
+        if (fallback !== undefined && (iosAngle === undefined || now - iosStandardSince >= 300)) {
+            iosUsesStandard = true;
+            iosStandardCandidate = undefined;
+        }
+        return iosUsesStandard && modernMatchesType ? modern : legacy ?? modern;
+    }
+
+    function watchIOSOrientation() {
+        if (!isIOS || viewMode !== "ar" || document.hidden || graphicsState !== "ready") return;
+        if (performance.now() >= iosWatchUntil) logOrientation("display-change", true);
+        iosWatchUntil = performance.now() + 2000;
+        queueIOSOrientation();
+    }
+
+    function queueIOSOrientation() {
+        if (iosFrame === undefined) iosFrame = requestAnimationFrame(updateIOSOrientation);
+    }
+
+    function updateIOSOrientation(now) {
+        iosFrame = undefined;
+        if (viewMode !== "ar" || document.hidden) return;
+        const angle = readIOSAngle(now);
+        if (angle === undefined || angle === iosAngle) iosTransition = undefined;
+        else if (angle !== iosTransition?.angle)
+            iosTransition = {angle, at: now, began: iosTransition?.began ?? now, pose: iosPose};
+        else if (iosAngle === undefined || (iosPose && iosPose !== iosTransition.pose) ||
+                 now - iosTransition.at >= 120) {
+            if (iosAngle !== undefined) {
+                screenTurns += 1;
+                // Do not reproject an old pose left over from before this turn.
+                if (iosPose && iosTransition.at - iosPose.at > 250) iosPose = undefined;
+            }
+            iosAngle = angle;
+            iosTransition = undefined;
+        }
+
+        // Pair a changed angle with the newest sample available. One frame verifies
+        // the angle; an arriving sample can finish the transition before the deadline.
+        const changedAngle = iosAngle !== lastSensor?.[3];
+        const pendingPose = iosPose && iosPose !== sentIOSPose;
+        const holding = iosTransition && now - iosTransition.began < 120;
+        const ready = iosPose && iosAngle !== undefined && !holding;
+        const waitingForThrottle = !changedAngle && pendingPose && now - sentSensorAt < 30;
+        if (instance && ready && (changedAngle || pendingPose && !waitingForThrottle)) {
+            const {alpha, beta, gamma, basis} = iosPose;
+            lastSensor = [alpha, beta, gamma, iosAngle, basis === "relative" ? 0 : 1, basis];
+            if (publishSensor(lastSensor)) sentIOSPose = iosPose;
+            sentSensorAt = now;
+        }
+        logOrientation(iosTransition ? "angle-settling" : "frame");
+        if (now < iosWatchUntil || iosTransition || iosStandardCandidate !== undefined ||
+            instance && ready && waitingForThrottle)
+            queueIOSOrientation();
+        else if (iosWatchUntil) {
+            iosWatchUntil = 0;
+            logOrientation("display-settled", true);
+        }
+    }
+
+    function logOrientation(reason, force = false) {
+        if (!debugOrientation) return;
+        const now = performance.now();
+        if (!force && now - lastOrientationLogAt < 250) return;
+        lastOrientationLogAt = now;
+        console.info("cho2 orientation trace", {
+            reason, browser: /CriOS/i.test(navigator.userAgent) ? "Chrome iOS" : navigator.userAgent,
+            now, sensor: lastOrientationEvent, sensorSamples, sensorInvalid,
+            legacyAngle: window.orientation, screenAngle: screen.orientation?.angle,
+            screenType: screen.orientation?.type, appliedAngle: lastSensor?.[3],
+            viewport: [window.innerWidth, window.innerHeight],
+            visualViewport: [window.visualViewport?.width, window.visualViewport?.height],
+            video: [video.videoWidth, video.videoHeight], sensorListening, viewMode,
+            tracking: viewMode === "ar" && sensorListening && !!lastSensor,
+            holdingPose: isIOS && viewMode === "ar" &&
+                (!iosPose || iosAngle === undefined || !!iosTransition && now - iosTransition.began < 120),
+            pendingAngle: iosTransition?.angle, screenTurns, basis: lastSensor?.[5],
+            selectedSource: iosSensorSource,
+            orientationMessages: sensorSent
+        });
+    }
+
+    function captureIOSPose(event, now, compass) {
+        const {alpha, beta, gamma, type, absolute, webkitCompassHeading} = event;
+        const nativeAbsolute = absolute === true || type === "deviceorientationabsolute";
+        let basis = nativeAbsolute ? "native-absolute" : "relative";
+        let offset;
+        if (iosBasis === "webkit-compass" && type === iosSensorSource) {
+            basis = iosBasis;
+        } else if (iosBasis !== "native-absolute" && compass && type === "deviceorientation") {
+            const device = deviceCompass(alpha, beta, gamma);
+            if (device.magnitude > 0.25) {
+                basis = "webkit-compass";
+                offset = webkitCompassHeading - device.heading;
+            }
+        }
+        // Different streams may use different alpha origins. Promote a relative
+        // session once when a north reference is available; keep it across gaps.
+        if (iosBasis && (basis !== iosBasis || type !== iosSensorSource) &&
+            !(iosBasis === "relative" && basis !== "relative")) return;
+        iosSensorSource = type;
+        iosBasis = basis;
+        if (offset !== undefined) iosCompassOffset = offset;
+        iosPose = {alpha: basis === "webkit-compass" ? alpha - iosCompassOffset : alpha,
+            beta, gamma, basis, at: now};
+        clearTimeout(sensorTimer);
+        queueIOSOrientation();
+    }
+
     function onOrientation(event) {
         const {alpha, beta, gamma, webkitCompassHeading, webkitCompassAccuracy} = event;
+        if (viewMode !== "ar" || graphicsState !== "ready") return;
+        if (debugOrientation)
+            lastOrientationEvent = {at: performance.now(), type: event.type, alpha, beta, gamma,
+                absolute: event.absolute, webkitCompassHeading, webkitCompassAccuracy};
         if (document.hidden) {
             if (!hiddenDropLogged) {
                 hiddenDropLogged = true;
@@ -805,10 +1122,12 @@
             sensorInvalid += 1;
             if (!nullAlphaLogged) {
                 nullAlphaLogged = true;
-                console.warn("cho2 orientation sample invalid", {type: event.type, alpha, beta, gamma, absolute: event.absolute});
+                console.warn("cho2 orientation sample invalid");
             }
+            logOrientation("invalid-sensor");
             return;
         }
+        const now = performance.now();
         const compass = Number.isFinite(webkitCompassHeading) && webkitCompassHeading >= 0 &&
             !(Number.isFinite(webkitCompassAccuracy) && webkitCompassAccuracy < 0);
         const absolute = compass || event.absolute === true || event.type === "deviceorientationabsolute";
@@ -819,12 +1138,14 @@
             sensorModeLogged = true;
             console.info("cho2 orientation sample", {
                 mode: absolute ? "absolute" : "relative",
-                type: event.type,
-                alpha, beta, gamma,
-                absolute: event.absolute
+                type: event.type
             });
         }
-        const now = performance.now();
+        if (isIOS) {
+            captureIOSPose(event, now, compass);
+            return;
+        }
+        const angle = readScreenAngle();
         if (!absolute && now - absoluteAt < 1500) return;
         if (absolute) absoluteAt = now;
         // Pass the device's alpha, not a compass heading. Unity applies beta, gamma
@@ -843,12 +1164,13 @@
         } else {
             compassOffsetReady = false;
         }
-        const angle = screen.orientation?.angle ?? window.orientation ?? 0;
+        const screenChanged = !lastSensor || angle !== lastSensor[3];
         lastSensor = [alphaForUnity, beta, gamma, angle, absolute ? 1 : 0];
-        if (now - sentSensorAt >= 30) {
+        if (screenChanged || now - sentSensorAt >= 30) {
             sentSensorAt = now;
             publishSensor(lastSensor);
         }
+        logOrientation("sensor");
     }
 
     function publishSensor(sample) {
@@ -857,7 +1179,7 @@
         notice("sensor", "");
         if (!send("HandleCho2Orientation", sample.join(","))) return;
         sensorSent += 1;
-        if (sensorSent === 1) console.info("cho2 orientation sent to Unity", sample.join(","));
+        return true;
     }
 
     function diagnostics() {
@@ -873,12 +1195,13 @@
             sensorRelative,
             sensorInvalid,
             sensorSent,
-            lastSensor: lastSensor ? lastSensor.join(",") : "",
+            ...(debugOrientation && {lastSensor: lastSensor?.join(",") ?? ""}),
             fullscreenElement: !!fullscreenElement(),
             fullscreenAttempts,
             lastFullscreenError,
             orientationLockResult,
-            displayMode: displayMode()
+            displayMode: displayMode(),
+            graphics: graphicsSnapshot()
         };
     }
 
@@ -889,5 +1212,5 @@
         window.location.reload();
     }
 
-    window.Cho2WebGL = {mount, start, requestLocation, cameraSize, uploadCamera, exit, diagnostics};
+    window.Cho2WebGL = {mount, start, requestLocation, cameraSize, uploadCamera, exit, diagnostics, recordProjection};
 })();
